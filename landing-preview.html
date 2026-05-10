@@ -1,0 +1,1920 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Credex — AI Spend Audit (preview)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;0,700;1,400&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #000000;
+        --text: #ffffff;
+        --muted: #9ca3af;
+        --border: rgba(255, 255, 255, 0.12);
+        --border-soft: rgba(255, 255, 255, 0.08);
+        --font: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        /* Static fallback + bars (reduced motion, preview stripes) */
+        --grad-headline: linear-gradient(
+          90deg,
+          #2563eb 0%,
+          #dc2626 48%,
+          #eab308 100%
+        );
+        --radius-pill: 9999px;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: var(--font);
+        color: var(--text);
+        background-color: var(--bg);
+        background-image:
+          radial-gradient(900px 520px at 12% -8%, rgba(148, 163, 184, 0.14), transparent 55%),
+          radial-gradient(700px 480px at 92% 5%, rgba(127, 29, 29, 0.12), transparent 50%);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .shell {
+        min-height: 100vh;
+        width: 100%;
+        max-width: none;
+        margin: 0 auto;
+        padding: 1.25rem 1.5rem 1rem;
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+      }
+
+      /* ——— Header ——— */
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        flex-wrap: wrap;
+        padding: 0.35rem 0 1rem;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 0.55rem;
+        font-weight: 700;
+        font-size: 1.2rem;
+        letter-spacing: -0.03em;
+        color: var(--text);
+        text-decoration: none;
+      }
+
+      .logo svg {
+        flex-shrink: 0;
+      }
+
+      .header-cta {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.6rem 1.35rem;
+        border-radius: var(--radius-pill);
+        font-size: 0.9375rem;
+        font-weight: 600;
+        background: var(--text);
+        color: var(--bg);
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+      }
+
+      .header-cta:hover {
+        opacity: 0.92;
+      }
+
+      /* ——— Hero ——— first screen; ledger scrolls below */
+      .hero {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding-top: clamp(1rem, 5vh, 3rem);
+        padding-bottom: clamp(0.35rem, 1.2vh, 0.65rem);
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+        width: 100%;
+        max-width: 58rem;
+        margin: 0 auto;
+        box-sizing: border-box;
+        min-height: calc(100svh - 5.5rem);
+        background-color: var(--bg);
+        border: none;
+        box-shadow: none;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: clamp(2.85rem, 7vw, 4.5rem);
+        font-weight: 700;
+        line-height: 1.05;
+        letter-spacing: -0.045em;
+      }
+
+      h1 .line1 {
+        display: block;
+        color: var(--text);
+      }
+
+      /* Continuous blue → red → yellow flow (seamless loop via wide gradient + pan) */
+      h1 .line2-wrap {
+        display: block;
+        min-height: 1.15em;
+      }
+
+      h1 .line2-inner {
+        display: inline-block;
+        background-image: linear-gradient(
+          90deg,
+          #1d4ed8,
+          #2563eb,
+          #dc2626,
+          #f97316,
+          #eab308,
+          #fde047,
+          #38bdf8,
+          #1d4ed8,
+          #2563eb,
+          #dc2626,
+          #eab308
+        );
+        background-size: 350% 100%;
+        background-position: 0% 50%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        animation: headlineGradientContinuous 14s linear infinite;
+        animation-play-state: paused;
+      }
+
+      h1 .line2-wrap.line2-wrap--flow .line2-inner {
+        animation-play-state: running;
+      }
+
+      /* Stop pan after user clicks Run free audit or View sample */
+      h1 .line2-wrap.line2-wrap--stopped .line2-inner {
+        animation: none;
+        background-image: var(--grad-headline);
+        background-size: 100% 100%;
+        background-position: 0% 50%;
+      }
+
+      @keyframes headlineGradientContinuous {
+        0% {
+          background-position: 0% 50%;
+        }
+        100% {
+          background-position: 100% 50%;
+        }
+      }
+
+      .type-cursor {
+        display: inline-block;
+        color: var(--muted);
+        font-weight: 400;
+        margin-left: 0.06em;
+        animation: typeCursorBlink 0.95s step-end infinite;
+        vertical-align: baseline;
+      }
+
+      @keyframes typeCursorBlink {
+        0%,
+        49% {
+          opacity: 1;
+        }
+        50%,
+        100% {
+          opacity: 0;
+        }
+      }
+
+      h1 .line2-wrap.typing-done .type-cursor {
+        display: none;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .type-cursor {
+          display: none !important;
+        }
+
+        h1 .line2-inner {
+          animation: none;
+          background: var(--grad-headline);
+          background-size: 100% 100%;
+        }
+      }
+
+      .sub {
+        margin: 1.35rem auto 0;
+        max-width: 42rem;
+        font-size: 1.3rem;
+        font-weight: 400;
+        line-height: 1.58;
+        color: var(--muted);
+      }
+
+      .cta-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.75rem;
+        justify-content: center;
+        align-items: center;
+        margin-top: 2rem;
+        margin-bottom: 0;
+      }
+
+      .btn-pill {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.8rem 1.55rem;
+        border-radius: var(--radius-pill);
+        font-family: var(--font);
+        font-size: 1.05rem;
+        font-weight: 600;
+        text-decoration: none;
+        cursor: pointer;
+        border: 1px solid transparent;
+        transition: opacity 0.15s ease;
+      }
+
+      .btn-pill:hover {
+        opacity: 0.9;
+      }
+
+      .btn-pill-primary {
+        background: var(--text);
+        color: var(--bg);
+        border-color: var(--text);
+      }
+
+      .btn-pill-secondary {
+        background: transparent;
+        color: var(--muted);
+        border-color: var(--border);
+      }
+
+      .btn-pill-secondary:hover {
+        color: var(--text);
+        border-color: rgba(255, 255, 255, 0.22);
+      }
+
+      .btn-pill svg.arrow {
+        width: 1.15rem;
+        height: 1.15rem;
+      }
+
+      /* ——— Feature grid — what the audit app does (Credex MVP scope) ——— */
+      .features-section {
+        width: 100%;
+        padding: clamp(1.5rem, 4vw, 2.5rem) clamp(1.25rem, 5vw, 2.5rem) clamp(2rem, 5vw, 3rem);
+        background-color: var(--bg);
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        margin-top: -1px;
+      }
+
+      .features-section--bottom {
+        padding-bottom: clamp(3rem, 8vw, 5.5rem);
+      }
+
+      .features-inner {
+        max-width: min(72rem, 100%);
+        margin: 0 auto;
+        width: 100%;
+      }
+
+      .features-section h2 {
+        margin: 0;
+        font-size: clamp(1.2rem, 2.6vw, 1.5rem);
+        font-weight: 600;
+        letter-spacing: -0.03em;
+        text-align: center;
+        color: #f8fafc;
+      }
+
+      .features-lead {
+        margin: 0.6rem auto 0;
+        max-width: 38rem;
+        text-align: center;
+        font-size: 0.95rem;
+        line-height: 1.55;
+        color: var(--muted);
+      }
+
+      .features-grid {
+        margin-top: clamp(1.5rem, 3.5vw, 2.25rem);
+        display: grid;
+        grid-template-columns: 1fr;
+        align-items: stretch;
+        gap: clamp(1.35rem, 3.8vw, 1.85rem);
+      }
+
+      @media (min-width: 640px) {
+        .features-grid {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: clamp(1.5rem, 4vw, 2.25rem);
+          row-gap: clamp(1.5rem, 4vw, 2.25rem);
+          column-gap: clamp(1.5rem, 4vw, 2.25rem);
+        }
+      }
+
+      /* Grafient-style: padded shell, inset darker visual well, copy band below (~60/40) */
+      .feature-card {
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        width: 100%;
+        min-height: 0;
+        border-radius: clamp(1.05rem, 2.2vw, 1.45rem);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        background: #111114;
+        box-shadow: none;
+        padding: clamp(0.65rem, 1.6vw, 0.85rem);
+        gap: clamp(0.6rem, 1.4vw, 0.85rem);
+        overflow: hidden;
+      }
+
+      .feature-card-visual {
+        position: relative;
+        flex: 3 1 0;
+        min-height: clamp(9.5rem, 32vw, 12.5rem);
+        padding: clamp(0.85rem, 2.2vw, 1.35rem);
+        border-radius: clamp(0.65rem, 1.5vw, 0.9rem);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+        background: linear-gradient(165deg, #0c0c0f 0%, #080809 55%, #0a0a0c 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .feature-card-visual svg {
+        width: 100%;
+        max-width: min(19rem, 100%);
+        height: auto;
+        opacity: 0.98;
+        display: block;
+        overflow: visible;
+      }
+
+      @media (min-width: 640px) {
+        .feature-card-visual {
+          min-height: clamp(10.5rem, 20vw, 14rem);
+          padding: clamp(1rem, 2.5vw, 1.5rem);
+        }
+
+        .feature-card-visual svg {
+          max-width: min(100%, 20rem);
+          max-height: min(11.5rem, 42vw);
+        }
+
+        .feature-card-bottom {
+          flex: 2 1 0;
+          justify-content: flex-start;
+          padding: 0 clamp(0.15rem, 0.6vw, 0.35rem) clamp(0.4rem, 1vw, 0.65rem);
+          overflow: visible;
+        }
+      }
+
+      /* Feature viz motion — subtle loops; disabled under prefers-reduced-motion */
+      @keyframes fc-viz-float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-2.5px);
+        }
+      }
+
+      @keyframes fc-line-flow {
+        to {
+          stroke-dashoffset: -36;
+        }
+      }
+
+      @keyframes fc-dot-glow {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.72;
+          transform: scale(1.2);
+        }
+      }
+
+      @keyframes fc-fill-shimmer {
+        0%,
+        100% {
+          opacity: 0.32;
+        }
+        50% {
+          opacity: 0.46;
+        }
+      }
+
+      @keyframes fc-metric-tick {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.78;
+        }
+      }
+
+      @keyframes fc-bar-wave {
+        0%,
+        100% {
+          transform: scaleY(1);
+        }
+        50% {
+          transform: scaleY(0.9);
+        }
+      }
+
+      @keyframes fc-panel-soft {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.88;
+        }
+      }
+
+      @keyframes fc-ring-soft {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.62;
+          transform: scale(1.06);
+        }
+      }
+
+      @keyframes fc-stamp-tilt {
+        0%,
+        100% {
+          transform: rotate(0deg);
+        }
+        50% {
+          transform: rotate(-5deg);
+        }
+      }
+
+      @keyframes fc-frame-glint {
+        0%,
+        100% {
+          opacity: 0.94;
+        }
+        50% {
+          opacity: 1;
+        }
+      }
+
+      @keyframes fc-dash-scan {
+        to {
+          stroke-dashoffset: -22;
+        }
+      }
+
+      @keyframes fc-check-pop {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        45% {
+          opacity: 0.88;
+          transform: scale(1.12);
+        }
+      }
+
+      @keyframes fc-shimmer-line {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scaleX(1);
+        }
+        50% {
+          opacity: 0.62;
+          transform: scaleX(0.94);
+        }
+      }
+
+      @keyframes fc-cross-pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.55;
+        }
+      }
+
+      @keyframes fc-mail-edge {
+        to {
+          stroke-dashoffset: -16;
+        }
+      }
+
+      @keyframes fc-svg-drift {
+        0%,
+        100% {
+          transform: translate3d(0, 0, 0) rotate(0deg);
+        }
+        33% {
+          transform: translate3d(0.5px, -1.5px, 0) rotate(0.2deg);
+        }
+        66% {
+          transform: translate3d(-0.35px, 1px, 0) rotate(-0.15deg);
+        }
+      }
+
+      .feature-card .feature-card-visual svg {
+        animation: fc-svg-drift 14s ease-in-out infinite;
+      }
+
+      .feature-card:nth-child(1) .feature-card-visual svg {
+        animation-duration: 15s;
+      }
+
+      .feature-card:nth-child(2) .feature-card-visual svg {
+        animation-duration: 17s;
+        animation-delay: -3s;
+      }
+
+      .feature-card:nth-child(3) .feature-card-visual svg {
+        animation-duration: 13s;
+        animation-delay: -5s;
+      }
+
+      .feature-card:nth-child(4) .feature-card-visual svg {
+        animation-duration: 16s;
+        animation-delay: -2s;
+      }
+
+      .fc-live-line {
+        stroke-dasharray: 9 12;
+        stroke-dashoffset: 0;
+        animation: fc-line-flow 5.5s linear infinite;
+      }
+
+      .fc-live-fill {
+        animation: fc-fill-shimmer 3.8s ease-in-out infinite;
+      }
+
+      .fc-live-dot {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: fc-dot-glow 2.4s ease-in-out infinite;
+      }
+
+      .fc-live-metric {
+        animation: fc-metric-tick 3s ease-in-out infinite;
+      }
+
+      .feature-card--a svg > rect:nth-of-type(1) {
+        animation-delay: 0s;
+      }
+
+      .feature-card--a svg > rect:nth-of-type(2) {
+        animation-delay: 0.35s;
+      }
+
+      .feature-card--a svg > rect:nth-of-type(3) {
+        animation-delay: 0.7s;
+      }
+
+      .fc-live-bar {
+        transform-box: fill-box;
+        transform-origin: bottom center;
+        animation: fc-bar-wave 2.8s ease-in-out infinite;
+      }
+
+      .feature-card--b svg > rect:nth-child(3) {
+        animation-delay: 0s;
+      }
+
+      .feature-card--b svg > rect:nth-child(4) {
+        animation-delay: 0.18s;
+      }
+
+      .feature-card--b svg > rect:nth-child(5) {
+        animation-delay: 0.36s;
+      }
+
+      .feature-card--b svg > rect:nth-child(6) {
+        animation-delay: 0.54s;
+      }
+
+      .fc-live-panel {
+        animation: fc-panel-soft 4s ease-in-out infinite;
+      }
+
+      .fc-live-ring {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: fc-ring-soft 2.8s ease-in-out infinite;
+      }
+
+      .feature-card--c .fc-live-ring {
+        animation-duration: 3.2s;
+      }
+
+      .fc-live-mail {
+        animation: fc-viz-float 4.5s ease-in-out infinite;
+      }
+
+      .fc-live-stamp {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: fc-stamp-tilt 3.5s ease-in-out infinite;
+      }
+
+      .fc-live-frame {
+        animation: fc-frame-glint 4.2s ease-in-out infinite;
+      }
+
+      .fc-live-dashes {
+        stroke-dasharray: 4 5;
+        stroke-dashoffset: 0;
+        animation: fc-dash-scan 3.4s linear infinite;
+      }
+
+      .fc-live-check {
+        transform-box: fill-box;
+        transform-origin: center;
+        animation: fc-check-pop 2.6s ease-in-out infinite;
+      }
+
+      .fc-live-skeleton {
+        transform-box: fill-box;
+        transform-origin: left center;
+        animation: fc-shimmer-line 2.4s ease-in-out infinite;
+      }
+
+      .feature-card--c svg > rect.fc-live-skeleton:nth-child(2) {
+        animation-delay: 0s;
+      }
+
+      .feature-card--c svg > rect.fc-live-skeleton:nth-child(3) {
+        animation-delay: 0.18s;
+      }
+
+      .feature-card--c svg > rect.fc-live-skeleton:nth-child(4) {
+        animation-delay: 0.36s;
+      }
+
+      .feature-card--d svg > rect.fc-live-skeleton:nth-child(2) {
+        animation-delay: 0s;
+      }
+
+      .feature-card--d svg > rect.fc-live-skeleton:nth-child(3) {
+        animation-delay: 0.2s;
+      }
+
+      .fc-live-cross {
+        animation: fc-cross-pulse 2.8s ease-in-out infinite;
+      }
+
+      .fc-live-plus {
+        animation: fc-cross-pulse 2.5s ease-in-out infinite;
+      }
+
+      .fc-live-mail-edge {
+        stroke-dasharray: 3 4;
+        stroke-dashoffset: 0;
+        animation: fc-mail-edge 5s linear infinite;
+      }
+
+      .feature-card-bottom {
+        display: flex;
+        flex-direction: column;
+        flex: 2 1 auto;
+        padding: 0 clamp(0.05rem, 0.5vw, 0.25rem) 0.15rem;
+        min-height: 0;
+      }
+
+      .feature-card-head {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.55rem;
+        margin-bottom: 0.45rem;
+      }
+
+      .feature-icon {
+        flex-shrink: 0;
+        width: 2.05rem;
+        height: 2.05rem;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        color: #e2e8f0;
+      }
+
+      .feature-icon svg {
+        width: 1.05rem;
+        height: 1.05rem;
+      }
+
+      .feature-card h3 {
+        margin: 0;
+        font-size: clamp(0.95rem, 1.9vw, 1.05rem);
+        font-weight: 600;
+        letter-spacing: -0.02em;
+        line-height: 1.28;
+        color: #f8fafc;
+      }
+
+      .feature-card-desc {
+        margin: 0;
+        font-size: clamp(0.82rem, 1.55vw, 0.9rem);
+        line-height: 1.5;
+        color: #94a3b8;
+      }
+
+      .feature-card--a .feature-icon {
+        color: #38bdf8;
+      }
+
+      .feature-card--b .feature-icon {
+        color: #4ade80;
+      }
+
+      .feature-card--c .feature-icon {
+        color: #a78bfa;
+      }
+
+      .feature-card--d .feature-icon {
+        color: #fbbf24;
+      }
+
+      /* ——— Reveal on scroll (insights + feature cards) ——— */
+      #insights-section:not(.in-view) .insights-inner > h2,
+      #insights-section:not(.in-view) .insights-lead,
+      #insights-section:not(.in-view) .insights-stack {
+        opacity: 0;
+      }
+
+      #insights-section:not(.in-view) .insights-inner > h2,
+      #insights-section:not(.in-view) .insights-lead {
+        transform: translateY(1rem);
+      }
+
+      #insights-section:not(.in-view) .insights-stack {
+        transform: translateY(0.65rem);
+      }
+
+      #insights-section.in-view .insights-inner > h2 {
+        opacity: 1;
+        transform: translateY(0);
+        transition:
+          opacity 0.55s ease,
+          transform 0.55s cubic-bezier(0.33, 1, 0.68, 1);
+      }
+
+      #insights-section.in-view .insights-lead {
+        opacity: 1;
+        transform: translateY(0);
+        transition:
+          opacity 0.52s ease 0.06s,
+          transform 0.52s cubic-bezier(0.33, 1, 0.68, 1) 0.06s;
+      }
+
+      #insights-section.in-view .insights-stack {
+        opacity: 1;
+        transform: translateY(0);
+        transition:
+          opacity 0.5s ease 0.18s,
+          transform 0.55s cubic-bezier(0.33, 1, 0.68, 1) 0.18s;
+      }
+
+      #what-it-does:not(.in-view) h2,
+      #what-it-does:not(.in-view) .features-lead {
+        opacity: 0;
+        transform: translateY(1rem);
+      }
+
+      #what-it-does.in-view h2 {
+        opacity: 1;
+        transform: translateY(0);
+        transition:
+          opacity 0.48s ease,
+          transform 0.48s cubic-bezier(0.33, 1, 0.68, 1);
+      }
+
+      #what-it-does.in-view .features-lead {
+        opacity: 1;
+        transform: translateY(0);
+        transition:
+          opacity 0.48s ease 0.06s,
+          transform 0.48s cubic-bezier(0.33, 1, 0.68, 1) 0.06s;
+      }
+
+      /* Feature cards: inner “boxes” (visual strip + text block) reveal per card when scrolled into view */
+      .feature-card:not(.feature-card--in-view) .feature-card-visual {
+        opacity: 0;
+        transform: translateY(0.65rem);
+      }
+
+      .feature-card:not(.feature-card--in-view) .feature-card-bottom {
+        opacity: 0;
+        transform: translateY(0.5rem);
+      }
+
+      .feature-card.feature-card--in-view .feature-card-visual {
+        opacity: 1;
+        transform: translateY(0);
+        transition:
+          opacity 0.52s ease,
+          transform 0.52s cubic-bezier(0.33, 1, 0.68, 1);
+      }
+
+      .feature-card.feature-card--in-view .feature-card-bottom {
+        opacity: 1;
+        transform: translateY(0);
+        transition:
+          opacity 0.48s ease 0.14s,
+          transform 0.48s cubic-bezier(0.33, 1, 0.68, 1) 0.14s;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        #insights-section:not(.in-view) .insights-inner > h2,
+        #insights-section:not(.in-view) .insights-lead,
+        #insights-section:not(.in-view) .insights-stack,
+        #what-it-does:not(.in-view) h2,
+        #what-it-does:not(.in-view) .features-lead,
+        .feature-card:not(.feature-card--in-view) .feature-card-visual,
+        .feature-card:not(.feature-card--in-view) .feature-card-bottom {
+          opacity: 1;
+          transform: none;
+        }
+
+        #insights-section.in-view .insights-inner > h2,
+        #insights-section.in-view .insights-lead,
+        #insights-section.in-view .insights-stack,
+        #what-it-does.in-view h2,
+        #what-it-does.in-view .features-lead,
+        .feature-card.feature-card--in-view .feature-card-visual,
+        .feature-card.feature-card--in-view .feature-card-bottom {
+          transition: none;
+        }
+
+        .insights-after {
+          max-height: none;
+          opacity: 1;
+          transform: none;
+          margin-top: 1.35rem;
+          padding-top: 1.2rem;
+          border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .insights-total-amount--before {
+          color: #64748b;
+          text-decoration: line-through;
+          text-decoration-color: rgba(248, 113, 113, 0.9);
+        }
+
+        .fc-live-line,
+        .fc-live-fill,
+        .fc-live-dot,
+        .fc-live-metric,
+        .fc-live-bar,
+        .fc-live-panel,
+        .fc-live-ring,
+        .fc-live-mail,
+        .fc-live-stamp,
+        .fc-live-frame,
+        .fc-live-dashes,
+        .fc-live-check,
+        .fc-live-skeleton,
+        .fc-live-cross,
+        .fc-live-plus,
+        .fc-live-mail-edge {
+          animation: none !important;
+        }
+
+        .feature-card .feature-card-visual svg {
+          animation: none !important;
+          transform: none !important;
+        }
+
+        .fc-live-line,
+        .fc-live-dashes,
+        .fc-live-mail-edge {
+          stroke-dasharray: unset;
+          stroke-dashoffset: 0;
+        }
+
+        .fc-live-dot,
+        .fc-live-ring,
+        .fc-live-stamp,
+        .fc-live-bar,
+        .fc-live-check,
+        .fc-live-skeleton {
+          transform: none !important;
+          opacity: 1 !important;
+        }
+
+        .fc-live-fill {
+          opacity: 0.35 !important;
+        }
+      }
+
+      /* ——— FY26 ledger — same surface as hero (no second “page”) ——— */
+      .ledger-section {
+        width: 100%;
+        background-color: var(--bg);
+        color: #e8eaef;
+        padding-top: clamp(0.5rem, 1.5vw, 1rem);
+        padding-bottom: clamp(2rem, 5vw, 3.5rem);
+        padding-left: clamp(1.25rem, 5vw, 2.5rem);
+        padding-right: clamp(1.25rem, 5vw, 2.5rem);
+        border: none;
+        border-top: 1px solid rgba(255, 255, 255, 0.14);
+        box-shadow: none;
+        /* Kill sub-pixel hairline between stacked sections */
+        margin-top: -1px;
+        padding-top: calc(clamp(0.75rem, 2vw, 1.25rem) + 1px);
+      }
+
+      .ledger-inner {
+        max-width: 58rem;
+        margin: 0 auto;
+        padding: 0;
+        border: none;
+        background: transparent;
+      }
+
+      .ledger-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 1rem;
+        padding-bottom: 0.65rem;
+        border-bottom: 3px double rgba(255, 255, 255, 0.12);
+      }
+
+      .ledger-head span {
+        font-size: 1.05rem;
+        font-weight: 600;
+        letter-spacing: 0.055em;
+        text-transform: uppercase;
+        color: #9ca3af;
+      }
+
+      .ledger-rows {
+        margin-top: 1.35rem;
+      }
+
+      .ledger-row {
+        display: flex;
+        align-items: baseline;
+        gap: 0.75rem;
+        margin-bottom: 1.15rem;
+        font-size: 1.22rem;
+        font-weight: 500;
+        color: #e5e7eb;
+        opacity: 0;
+        transform: translateY(12px);
+        transition: opacity 0.45s ease, transform 0.45s ease;
+      }
+
+      .ledger-row--visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .ledger-label {
+        flex-shrink: 1;
+        text-align: left;
+        line-height: 1.45;
+      }
+
+      .ledger-leader {
+        flex: 1 1 auto;
+        border-bottom: 1px dotted rgba(255, 255, 255, 0.18);
+        min-height: 0.65em;
+        margin: 0 0.2rem;
+        align-self: flex-end;
+        margin-bottom: 0.3rem;
+      }
+
+      .ledger-amt {
+        flex-shrink: 0;
+        font-variant-numeric: tabular-nums;
+        font-weight: 600;
+        font-size: 1.22rem;
+        min-width: 6.25rem;
+        text-align: right;
+        color: #f3f4f6;
+      }
+
+      .ledger-divider {
+        margin-top: 1.45rem;
+        padding-top: 1.15rem;
+        border-top: 3px double rgba(255, 255, 255, 0.12);
+      }
+
+      .ledger-total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 1rem;
+        flex-wrap: wrap;
+        opacity: 0;
+        transform: translateY(12px);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+      }
+
+      .ledger-total-row--visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .ledger-total-label {
+        font-size: 0.88rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #9ca3af;
+      }
+
+      .ledger-total-num-wrap {
+        position: relative;
+        display: inline-block;
+      }
+
+      .ledger-total-num {
+        font-family: "Newsreader", Georgia, serif;
+        font-size: clamp(3.65rem, 10vw, 5.15rem);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1;
+        padding: 0.15rem 0.45rem;
+        color: #fafafa;
+        background: linear-gradient(
+          transparent 38%,
+          rgba(244, 63, 94, 0.35) 38%,
+          rgba(244, 63, 94, 0.35) 74%,
+          transparent 74%
+        );
+        font-variant-numeric: tabular-nums;
+      }
+
+      .ledger-foot {
+        margin-top: 1.85rem;
+        text-align: center;
+        font-family: "Newsreader", Georgia, serif;
+        font-size: 1.22rem;
+        font-style: italic;
+        color: #9ca3af;
+      }
+
+      .ledger-foot a {
+        color: #cbd5e1;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      .ledger-foot a:hover {
+        color: #f1f5f9;
+      }
+
+      .ledger-source {
+        font-size: 0.82rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: none;
+      }
+
+      .ledger-source a {
+        color: #cbd5e1;
+        text-decoration: none;
+        border-bottom: 1px solid rgba(203, 213, 225, 0.35);
+      }
+
+      .ledger-source a:hover {
+        color: #f1f5f9;
+        border-bottom-color: rgba(241, 245, 249, 0.55);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .ledger-row,
+        .ledger-total-row {
+          opacity: 1;
+          transform: none;
+          transition: none;
+        }
+      }
+
+      /* ——— Current spend snapshot ——— */
+      .insights-section {
+        width: 100%;
+        padding: clamp(2rem, 5vw, 3.5rem) clamp(1.25rem, 5vw, 2.5rem) clamp(3rem, 6vw, 4.5rem);
+        background-color: var(--bg);
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+      }
+
+      .insights-inner {
+        max-width: 72rem;
+        margin: 0 auto;
+      }
+
+      .insights-section > .insights-inner > h2 {
+        margin: 0 0 0.45rem;
+        font-size: clamp(1.45rem, 3.2vw, 1.95rem);
+        font-weight: 600;
+        letter-spacing: -0.03em;
+        text-align: center;
+        color: #f8fafc;
+      }
+
+      .insights-lead {
+        margin: 0 auto clamp(1.25rem, 3vw, 1.85rem);
+        max-width: min(34rem, 100%);
+        text-align: center;
+        font-size: clamp(0.88rem, 2vw, 0.98rem);
+        line-height: 1.5;
+        color: #94a3b8;
+      }
+
+      .insights-panel {
+        border: none;
+        border-radius: 0;
+        padding: 0.35rem 0 0;
+        background: transparent;
+      }
+
+      .insights-stack {
+        width: 100%;
+        max-width: min(42rem, 100%);
+        margin: 0 auto;
+      }
+
+      .insights-panel--current {
+        width: 100%;
+      }
+
+      .insights-total-amount--before {
+        display: inline-block;
+        transition:
+          color 0.45s ease,
+          text-decoration-color 0.45s ease;
+        text-decoration: none;
+        text-decoration-thickness: 2px;
+      }
+
+      .insights-section.in-view.insights-sequence-cut .insights-total-amount--before {
+        color: #64748b;
+        text-decoration: line-through;
+        text-decoration-color: rgba(248, 113, 113, 0.9);
+      }
+
+      .insights-after {
+        margin-top: 0;
+        padding-top: 0;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        transform: translateY(0.5rem);
+        transition:
+          opacity 0.55s cubic-bezier(0.33, 1, 0.68, 1),
+          transform 0.55s cubic-bezier(0.33, 1, 0.68, 1),
+          max-height 0.6s ease,
+          margin-top 0.5s ease,
+          padding-top 0.5s ease;
+      }
+
+      .insights-section.in-view.insights-sequence-after .insights-after {
+        margin-top: 1.35rem;
+        padding-top: 1.2rem;
+        max-height: 32rem;
+        opacity: 1;
+        transform: translateY(0);
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .insights-panel-title--after {
+        color: #4ade80;
+      }
+
+      .insights-bar--opt {
+        background: linear-gradient(90deg, #166534, #22c55e, #4ade80);
+      }
+
+      .insights-bar--opt-muted {
+        background: linear-gradient(90deg, #3f3f46, #52525b, #71717a);
+      }
+
+      .insights-total--after span {
+        color: rgba(74, 222, 128, 0.88);
+      }
+
+      .insights-total--after strong {
+        color: #4ade80;
+      }
+
+      .insights-panel-title {
+        margin: 0 0 1.05rem;
+        font-size: 0.82rem;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #94a3b8;
+      }
+
+      .insights-row {
+        display: grid;
+        grid-template-columns: minmax(0, 1.15fr) minmax(52px, 1fr) auto;
+        gap: 0.55rem 0.85rem;
+        align-items: center;
+        margin-bottom: 0.95rem;
+      }
+
+      .insights-model {
+        font-size: 0.93rem;
+        font-weight: 500;
+        color: #e2e8f0;
+        line-height: 1.3;
+      }
+
+      .insights-bar-track {
+        height: 10px;
+        background: rgba(255, 255, 255, 0.07);
+        border-radius: 999px;
+        overflow: hidden;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
+      }
+
+      .insights-bar {
+        height: 100%;
+        border-radius: 999px;
+        transition: width 0.8s cubic-bezier(0.33, 1, 0.68, 1);
+      }
+
+      .insights-bar--current {
+        background: linear-gradient(90deg, #b45309, #c2410c, #d97706);
+      }
+
+      .insights-bar--current-muted {
+        background: linear-gradient(90deg, #475569, #64748b, #94a3b8);
+      }
+
+      .insights-price {
+        font-size: 0.98rem;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        color: #f1f5f9;
+        text-align: right;
+      }
+
+      .insights-total {
+        display: flex;
+        justify-content: flex-end;
+        align-items: baseline;
+        gap: 0.55rem;
+        margin-top: 1.15rem;
+        padding-top: 1.1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .insights-total span {
+        font-size: 0.8rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: #94a3b8;
+      }
+
+      .insights-total strong {
+        font-size: clamp(1.45rem, 3.5vw, 1.75rem);
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        color: #fff;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <header>
+        <a class="logo" href="#audit" aria-label="Credex home">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 3L20 19H4L12 3Z" fill="currentColor" />
+          </svg>
+          Credex
+        </a>
+        <a class="header-cta" href="#audit">Run audit</a>
+      </header>
+
+      <section class="hero" id="audit">
+        <h1>
+          <span class="line1">Know your stack.</span>
+          <span class="line2-wrap" aria-label="Headline cycles between two phrases">
+            <span class="line2-inner" id="line2-typed" aria-live="polite"></span><span class="type-cursor" aria-hidden="true">|</span>
+          </span>
+        </h1>
+        <p class="sub">
+          For anyone paying for AI tools—teams, founders, or students. Rule-based audit, optional summary, a
+          report link you can send—no login.
+        </p>
+        <div class="cta-row">
+          <a class="btn-pill btn-pill-primary" id="cta-run-audit" href="#">
+            Run free audit
+            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
+              <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </a>
+          <a class="btn-pill btn-pill-secondary" id="cta-view-sample" href="#">View sample</a>
+        </div>
+      </section>
+
+      <section class="ledger-section" id="ledger-section" aria-labelledby="ledger-heading">
+        <div class="ledger-inner">
+          <div class="ledger-head">
+            <span id="ledger-heading">AI waste — individual contributor ledger</span>
+            <span class="ledger-source"
+              ><a href="https://www.getverbal.ai/" target="_blank" rel="noopener noreferrer">Verbal</a></span
+            >
+          </div>
+          <div class="ledger-rows">
+            <div class="ledger-row" data-ledger-row data-amount="600">
+              <span class="ledger-label">Stacked subscriptions (ChatGPT + Claude + Copilot)</span>
+              <span class="ledger-leader" aria-hidden="true"></span>
+              <span class="ledger-amt"><span data-count>$0</span></span>
+            </div>
+            <div class="ledger-row" data-ledger-row data-amount="1920">
+              <span class="ledger-label">Max-plan premium over mid-tier</span>
+              <span class="ledger-leader" aria-hidden="true"></span>
+              <span class="ledger-amt"><span data-count>$0</span></span>
+            </div>
+            <div class="ledger-row" data-ledger-row data-amount="4800">
+              <span class="ledger-label">Wrong-model usage (premium for mini-class tasks)</span>
+              <span class="ledger-leader" aria-hidden="true"></span>
+              <span class="ledger-amt"><span data-count>$0</span></span>
+            </div>
+            <div class="ledger-row" data-ledger-row data-amount="2400">
+              <span class="ledger-label">Idle / forgotten API budget</span>
+              <span class="ledger-leader" aria-hidden="true"></span>
+              <span class="ledger-amt"><span data-count>$0</span></span>
+            </div>
+            <div class="ledger-row" data-ledger-row data-amount="1800">
+              <span class="ledger-label">Failed re-runs &amp; retries</span>
+              <span class="ledger-leader" aria-hidden="true"></span>
+              <span class="ledger-amt"><span data-count>$0</span></span>
+            </div>
+            <div class="ledger-row" data-ledger-row data-amount="2880">
+              <span class="ledger-label">Duplicate-tool overlap</span>
+              <span class="ledger-leader" aria-hidden="true"></span>
+              <span class="ledger-amt"><span data-count>$0</span></span>
+            </div>
+          </div>
+          <div class="ledger-divider">
+            <div class="ledger-total-row" id="ledger-total-block">
+              <span class="ledger-total-label">Total waste / yr</span>
+              <span class="ledger-total-num-wrap">
+                <span class="ledger-total-num" id="ledger-total-num" aria-live="polite">$0</span>
+              </span>
+            </div>
+          </div>
+          <p class="ledger-foot">
+            Annual category totals from
+            <a href="https://www.getverbal.ai/" target="_blank" rel="noopener noreferrer">Verbal</a>.
+          </p>
+        </div>
+      </section>
+
+      <section class="insights-section" id="insights-section" aria-labelledby="insights-heading">
+        <div class="insights-inner">
+          <h2 id="insights-heading">Current spend</h2>
+          <p class="insights-lead">Illustrative model mix—then the same workload after rule-based swaps (illustrative).</p>
+          <div class="insights-stack">
+            <div class="insights-panel insights-panel--current" aria-label="Current monthly spend by model">
+              <h3 class="insights-panel-title">By model</h3>
+              <div class="insights-row">
+                <span class="insights-model">Claude 3.5 Sonnet</span>
+                <div class="insights-bar-track"><div class="insights-bar insights-bar--current" style="width: 100%"></div></div>
+                <span class="insights-price">$1,240</span>
+              </div>
+              <div class="insights-row">
+                <span class="insights-model">GPT-4o</span>
+                <div class="insights-bar-track"><div class="insights-bar insights-bar--current-muted" style="width: 71.8%"></div></div>
+                <span class="insights-price">$890</span>
+              </div>
+              <div class="insights-row">
+                <span class="insights-model">Claude 3.5 Haiku</span>
+                <div class="insights-bar-track"><div class="insights-bar insights-bar--current-muted" style="width: 25.8%"></div></div>
+                <span class="insights-price">$320</span>
+              </div>
+              <div class="insights-row">
+                <span class="insights-model">GPT-4o-mini</span>
+                <div class="insights-bar-track"><div class="insights-bar insights-bar--current-muted" style="width: 6.9%"></div></div>
+                <span class="insights-price">$85</span>
+              </div>
+              <div class="insights-total insights-total--current">
+                <span>Total/mo</span>
+                <strong class="insights-total-amount insights-total-amount--before">$2,535</strong>
+              </div>
+            </div>
+
+            <div class="insights-after" aria-label="Optimized monthly spend after Credex-style changes">
+              <h3 class="insights-panel-title insights-panel-title--after">After Credex</h3>
+              <div class="insights-row">
+                <span class="insights-model">Claude 3.5 Haiku</span>
+                <div class="insights-bar-track"><div class="insights-bar insights-bar--opt" style="width: 100%"></div></div>
+                <span class="insights-price">$640</span>
+              </div>
+              <div class="insights-row">
+                <span class="insights-model">GPT-4o-mini</span>
+                <div class="insights-bar-track"><div class="insights-bar insights-bar--opt" style="width: 27.3%"></div></div>
+                <span class="insights-price">$175</span>
+              </div>
+              <div class="insights-row">
+                <span class="insights-model">Claude 3.5 Sonnet</span>
+                <div class="insights-bar-track"><div class="insights-bar insights-bar--opt-muted" style="width: 43.75%"></div></div>
+                <span class="insights-price">$280</span>
+              </div>
+              <div class="insights-row">
+                <span class="insights-model">GPT-4o</span>
+                <div class="insights-bar-track"><div class="insights-bar insights-bar--opt-muted" style="width: 25%"></div></div>
+                <span class="insights-price">$160</span>
+              </div>
+              <div class="insights-total insights-total--after">
+                <span>Total/mo</span><strong>$1,255</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="features-section features-section--bottom" id="what-it-does" aria-labelledby="features-heading">
+        <div class="features-inner">
+          <h2 id="features-heading">From your stack to numbers you can forward</h2>
+          <p class="features-lead">
+            Free AI spend audit—no login.
+            <br />
+            One stack snapshot, defensible savings math, a report link for finance or your team.
+          </p>
+          <div class="features-grid">
+            <article class="feature-card feature-card--a">
+              <div class="feature-card-visual" aria-hidden="true">
+                <svg viewBox="0 0 200 112" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect class="fc-live-metric" x="8" y="8" width="56" height="28" rx="4" fill="rgba(56,189,248,0.12)" stroke="rgba(56,189,248,0.35)" />
+                  <text x="14" y="22" fill="#94a3b8" font-size="9" font-family="system-ui, sans-serif">Spend</text>
+                  <text x="14" y="32" fill="#e2e8f0" font-size="11" font-family="system-ui, sans-serif" font-weight="600">$2.8k</text>
+                  <rect class="fc-live-metric" x="72" y="8" width="56" height="28" rx="4" fill="rgba(167,139,250,0.1)" stroke="rgba(167,139,250,0.35)" />
+                  <text x="78" y="22" fill="#94a3b8" font-size="9" font-family="system-ui, sans-serif">Tools</text>
+                  <text x="78" y="32" fill="#e2e8f0" font-size="11" font-family="system-ui, sans-serif" font-weight="600">6</text>
+                  <rect class="fc-live-metric" x="136" y="8" width="56" height="28" rx="4" fill="rgba(74,222,128,0.1)" stroke="rgba(74,222,128,0.35)" />
+                  <text x="142" y="22" fill="#94a3b8" font-size="9" font-family="system-ui, sans-serif">Save</text>
+                  <text x="142" y="32" fill="#4ade80" font-size="11" font-family="system-ui, sans-serif" font-weight="600">18%</text>
+                  <rect class="fc-live-frame" x="12" y="46" width="176" height="54" rx="6" fill="rgba(0,0,0,0.35)" stroke="rgba(255,255,255,0.08)" />
+                  <path
+                    class="fc-live-line"
+                    d="M22 88 L44 72 L68 78 L92 58 L118 64 L142 48 L178 52"
+                    stroke="url(#viz-a-line)"
+                    stroke-width="2.2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    fill="none"
+                  />
+                  <path
+                    class="fc-live-fill"
+                    d="M22 88 L44 72 L68 78 L92 58 L118 64 L142 48 L178 52 V96 H22 Z"
+                    fill="url(#viz-a-fill)"
+                    opacity="0.35"
+                  />
+                  <circle class="fc-live-dot" cx="178" cy="52" r="4" fill="#34d399" />
+                  <defs>
+                    <linearGradient id="viz-a-line" x1="22" y1="58" x2="178" y2="88" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#38bdf8" />
+                      <stop offset="1" stop-color="#34d399" />
+                    </linearGradient>
+                    <linearGradient id="viz-a-fill" x1="22" y1="48" x2="178" y2="96" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#38bdf8" stop-opacity="0.5" />
+                      <stop offset="1" stop-color="#34d399" stop-opacity="0" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
+              <div class="feature-card-bottom">
+                <div class="feature-card-head">
+                  <span class="feature-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                      <path d="M4 19h16M4 15l4-4 4 4 4-6 4 4" />
+                    </svg>
+                  </span>
+                  <h3>Log your AI stack</h3>
+                </div>
+                <p class="feature-card-desc">
+                  Tools, spend, seats, use case—saved if you reload.
+                </p>
+              </div>
+            </article>
+
+            <article class="feature-card feature-card--b">
+              <div class="feature-card-visual" aria-hidden="true">
+                <svg viewBox="0 0 200 112" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect class="fc-live-panel" x="16" y="16" width="168" height="80" rx="8" fill="rgba(0,0,0,0.35)" stroke="rgba(74,222,128,0.25)" />
+                  <path class="fc-live-dashes" d="M32 36h96M32 52h120M32 68h72" stroke="#64748b" stroke-width="1.5" stroke-linecap="round" />
+                  <rect class="fc-live-bar" x="40" y="78" width="28" height="22" rx="3" fill="rgba(74,222,128,0.35)" />
+                  <rect class="fc-live-bar" x="76" y="72" width="28" height="28" rx="3" fill="rgba(74,222,128,0.55)" />
+                  <rect class="fc-live-bar" x="112" y="64" width="28" height="36" rx="3" fill="rgba(74,222,128,0.75)" />
+                  <rect class="fc-live-bar" x="148" y="76" width="28" height="24" rx="3" fill="rgba(74,222,128,0.4)" />
+                  <circle class="fc-live-ring" cx="168" cy="28" r="14" fill="rgba(74,222,128,0.15)" stroke="#4ade80" stroke-width="1.5" />
+                  <path class="fc-live-check" d="M162 28l4 4 8-10" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              </div>
+              <div class="feature-card-bottom">
+                <div class="feature-card-head">
+                  <span class="feature-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="4" y="4" width="16" height="16" rx="2" />
+                      <path d="M9 9h6M9 13h4M9 17h6" stroke-linecap="round" />
+                    </svg>
+                  </span>
+                  <h3>Rule-based audit</h3>
+                </div>
+                <p class="feature-card-desc">
+                  Plan fit, cheaper tiers, alternatives—priced from PRICING_DATA.md, not vibes.
+                </p>
+              </div>
+            </article>
+
+            <article class="feature-card feature-card--c">
+              <div class="feature-card-visual" aria-hidden="true">
+                <svg viewBox="0 0 200 112" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect class="fc-live-panel" x="24" y="20" width="152" height="72" rx="10" fill="#0f1114" stroke="rgba(167,139,250,0.45)" stroke-width="1.5" />
+                  <rect class="fc-live-skeleton" x="36" y="32" width="128" height="8" rx="2" fill="rgba(148,163,184,0.25)" />
+                  <rect class="fc-live-skeleton" x="36" y="46" width="96" height="6" rx="2" fill="rgba(148,163,184,0.15)" />
+                  <rect class="fc-live-skeleton" x="36" y="58" width="112" height="6" rx="2" fill="rgba(148,163,184,0.15)" />
+                  <circle class="fc-live-ring" cx="156" cy="38" r="16" fill="rgba(167,139,250,0.25)" />
+                  <path class="fc-live-cross" d="M148 38h16M156 30v16" stroke="#c4b5fd" stroke-width="2" stroke-linecap="round" />
+                </svg>
+              </div>
+              <div class="feature-card-bottom">
+                <div class="feature-card-head">
+                  <span class="feature-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke-linecap="round" />
+                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke-linecap="round" />
+                    </svg>
+                  </span>
+                  <h3>Report in one link</h3>
+                </div>
+                <p class="feature-card-desc">
+                  One public report page with a rich link preview—no personal details on it.
+                </p>
+              </div>
+            </article>
+
+            <article class="feature-card feature-card--d">
+              <div class="feature-card-visual" aria-hidden="true">
+                <svg viewBox="0 0 200 112" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <g class="fc-live-mail">
+                    <rect x="40" y="28" width="120" height="68" rx="8" fill="#0f1114" stroke="rgba(251,191,36,0.45)" stroke-width="1.5" />
+                    <path class="fc-live-mail-edge" d="M40 36l60 38 60-38" stroke="rgba(251,191,36,0.5)" stroke-width="1.5" stroke-linecap="round" />
+                  </g>
+                  <rect class="fc-live-skeleton" x="56" y="54" width="88" height="8" rx="2" fill="rgba(148,163,184,0.2)" />
+                  <rect class="fc-live-skeleton" x="56" y="68" width="64" height="6" rx="2" fill="rgba(148,163,184,0.12)" />
+                  <circle class="fc-live-stamp" cx="158" cy="44" r="18" fill="rgba(251,191,36,0.15)" stroke="#fbbf24" stroke-width="1.5" />
+                  <path class="fc-live-plus" d="M152 44h12M158 38v12" stroke="#fcd34d" stroke-width="2" stroke-linecap="round" />
+                </svg>
+              </div>
+              <div class="feature-card-bottom">
+                <div class="feature-card-head">
+                  <span class="feature-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                      <path d="m22 6-10 7L2 6" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                  </span>
+                  <h3>Email after value</h3>
+                </div>
+                <p class="feature-card-desc">
+                  Email optional after results—confirmation plus summary when they opt in.
+                </p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+    </div>
+    <script>
+      (function () {
+        var PHRASES = ["Rule-based audit.", "A report link you can send."];
+        var wrap = document.querySelector("h1 .line2-wrap");
+        var inner = document.querySelector("#line2-typed");
+        if (!wrap || !inner) return;
+
+        var reduced =
+          window.matchMedia &&
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        if (reduced) {
+          inner.textContent = PHRASES[0];
+          return;
+        }
+
+        var typingTimeoutId = null;
+        var phraseIndex = 0;
+        var charIndex = 0;
+        var msPerChar = 48;
+        var msPerDelete = 34;
+        var holdBeforeDeleteMs = 2200;
+        var gapBeforeNextPhraseMs = 380;
+        var startDelayMs = 240;
+
+        function clearTimer() {
+          if (typingTimeoutId !== null) {
+            window.clearTimeout(typingTimeoutId);
+            typingTimeoutId = null;
+          }
+        }
+
+        function finishTypingNow() {
+          clearTimer();
+          inner.textContent = PHRASES[0];
+          phraseIndex = 0;
+          charIndex = PHRASES[0].length;
+          wrap.classList.add("typing-done");
+        }
+
+        function stopHeadlineGradient() {
+          finishTypingNow();
+          wrap.classList.remove("line2-wrap--flow");
+          wrap.classList.add("line2-wrap--stopped");
+        }
+
+        function startTypingPhrase() {
+          charIndex = 0;
+          inner.textContent = "";
+          wrap.classList.remove("typing-done");
+          typeForward();
+        }
+
+        function typeForward() {
+          var phrase = PHRASES[phraseIndex];
+          if (charIndex >= phrase.length) {
+            wrap.classList.add("typing-done");
+            typingTimeoutId = window.setTimeout(function () {
+              wrap.classList.remove("typing-done");
+              deleteBackward();
+            }, holdBeforeDeleteMs);
+            return;
+          }
+          inner.textContent += phrase.charAt(charIndex);
+          charIndex += 1;
+          typingTimeoutId = window.setTimeout(typeForward, msPerChar);
+        }
+
+        function deleteBackward() {
+          if (inner.textContent.length <= 0) {
+            phraseIndex = (phraseIndex + 1) % PHRASES.length;
+            typingTimeoutId = window.setTimeout(startTypingPhrase, gapBeforeNextPhraseMs);
+            return;
+          }
+          inner.textContent = inner.textContent.slice(0, -1);
+          typingTimeoutId = window.setTimeout(deleteBackward, msPerDelete);
+        }
+
+        typingTimeoutId = window.setTimeout(function () {
+          typingTimeoutId = null;
+          wrap.classList.add("line2-wrap--flow");
+          startTypingPhrase();
+        }, startDelayMs);
+
+        var runAudit = document.getElementById("cta-run-audit");
+        var viewSample = document.getElementById("cta-view-sample");
+        [runAudit, viewSample].forEach(function (el) {
+          if (!el) return;
+          el.addEventListener("click", function () {
+            stopHeadlineGradient();
+          });
+        });
+      })();
+    </script>
+    <script>
+      (function () {
+        var ledgerSection = document.getElementById("ledger-section");
+        if (!ledgerSection) return;
+
+        var prefersReduced =
+          window.matchMedia &&
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        function fmtCurrency(n) {
+          return "$" + Math.round(n).toLocaleString("en-US");
+        }
+
+        function delay(ms) {
+          return new Promise(function (resolve) {
+            window.setTimeout(resolve, ms);
+          });
+        }
+
+        function countUp(el, target, durationMs) {
+          return new Promise(function (resolve) {
+            var start = performance.now();
+            function frame(now) {
+              var t = Math.min(1, (now - start) / durationMs);
+              var eased = 1 - Math.pow(1 - t, 3);
+              var val = Math.round(target * eased);
+              el.textContent = fmtCurrency(val);
+              if (t < 1) {
+                requestAnimationFrame(frame);
+              } else {
+                el.textContent = fmtCurrency(target);
+                resolve();
+              }
+            }
+            requestAnimationFrame(frame);
+          });
+        }
+
+        function showStaticLedger() {
+          var rows = ledgerSection.querySelectorAll("[data-ledger-row]");
+          for (var i = 0; i < rows.length; i++) {
+            rows[i].classList.add("ledger-row--visible");
+            var amtEl = rows[i].querySelector("[data-count]");
+            var target = parseInt(rows[i].getAttribute("data-amount"), 10);
+            if (amtEl) amtEl.textContent = fmtCurrency(target);
+          }
+          var totalBlock = document.getElementById("ledger-total-block");
+          var totalNum = document.getElementById("ledger-total-num");
+          if (totalBlock) totalBlock.classList.add("ledger-total-row--visible");
+          if (totalNum) totalNum.textContent = fmtCurrency(14400);
+        }
+
+        async function runLedgerSequence() {
+          var rows = ledgerSection.querySelectorAll("[data-ledger-row]");
+          for (var j = 0; j < rows.length; j++) {
+            rows[j].classList.add("ledger-row--visible");
+            var amtEl = rows[j].querySelector("[data-count]");
+            var target = parseInt(rows[j].getAttribute("data-amount"), 10);
+            if (amtEl) await countUp(amtEl, target, 620);
+            await delay(115);
+          }
+          await delay(220);
+          var totalBlock = document.getElementById("ledger-total-block");
+          var totalNum = document.getElementById("ledger-total-num");
+          if (totalBlock) totalBlock.classList.add("ledger-total-row--visible");
+          if (totalNum) await countUp(totalNum, 14400, 1050);
+        }
+
+        if (prefersReduced) {
+          showStaticLedger();
+          return;
+        }
+
+        var played = false;
+        var io = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (!entry.isIntersecting || played) return;
+              played = true;
+              io.disconnect();
+              runLedgerSequence();
+            });
+          },
+          { threshold: 0.2, rootMargin: "0px 0px -5% 0px" }
+        );
+        io.observe(ledgerSection);
+      })();
+    </script>
+    <script>
+      (function () {
+        var prefersReduced =
+          window.matchMedia &&
+          window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+        function revealSection(el) {
+          if (!el) return;
+          if (prefersReduced) {
+            el.classList.add("in-view");
+            return;
+          }
+          var io = new IntersectionObserver(
+            function (entries) {
+              entries.forEach(function (entry) {
+                if (!entry.isIntersecting) return;
+                entry.target.classList.add("in-view");
+                io.unobserve(entry.target);
+              });
+            },
+            { threshold: 0.12, rootMargin: "0px 0px -6% 0px" }
+          );
+          io.observe(el);
+        }
+
+        (function setupInsightsSpendSequence() {
+          var insights = document.getElementById("insights-section");
+          if (!insights) return;
+          if (prefersReduced) {
+            insights.classList.add("in-view", "insights-sequence-cut", "insights-sequence-after");
+            return;
+          }
+
+          var cutT = null;
+          var afterT = null;
+
+          function clearSequenceState() {
+            if (cutT != null) {
+              window.clearTimeout(cutT);
+              cutT = null;
+            }
+            if (afterT != null) {
+              window.clearTimeout(afterT);
+              afterT = null;
+            }
+            insights.classList.remove("insights-sequence-cut", "insights-sequence-after");
+          }
+
+          function startSpendSequence() {
+            clearSequenceState();
+            insights.classList.add("in-view");
+            cutT = window.setTimeout(function () {
+              cutT = null;
+              insights.classList.add("insights-sequence-cut");
+            }, 900);
+            afterT = window.setTimeout(function () {
+              afterT = null;
+              insights.classList.add("insights-sequence-after");
+            }, 1750);
+          }
+
+          var io = new IntersectionObserver(
+            function (entries) {
+              entries.forEach(function (entry) {
+                if (entry.isIntersecting) {
+                  startSpendSequence();
+                } else {
+                  clearSequenceState();
+                }
+              });
+            },
+            { threshold: 0.12, rootMargin: "0px 0px -6% 0px" }
+          );
+          io.observe(insights);
+        })();
+
+        revealSection(document.getElementById("what-it-does"));
+
+        var featuresWrap = document.getElementById("what-it-does");
+        if (featuresWrap) {
+          var featureCards = featuresWrap.querySelectorAll(".feature-card");
+          if (prefersReduced) {
+            featureCards.forEach(function (card) {
+              card.classList.add("feature-card--in-view");
+            });
+          } else {
+            var cardIo = new IntersectionObserver(
+              function (entries) {
+                entries.forEach(function (entry) {
+                  if (!entry.isIntersecting) return;
+                  entry.target.classList.add("feature-card--in-view");
+                  cardIo.unobserve(entry.target);
+                });
+              },
+              { threshold: 0.15, rootMargin: "0px 0px -12% 0px" }
+            );
+            featureCards.forEach(function (card) {
+              cardIo.observe(card);
+            });
+          }
+        }
+      })();
+    </script>
+  </body>
+</html>
