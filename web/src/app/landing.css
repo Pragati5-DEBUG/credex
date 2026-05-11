@@ -1,23 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Credex — AI Spend Audit (preview)</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Newsreader:ital,wght@0,400;0,700;1,400&display=swap"
-      rel="stylesheet"
-    />
-    <style>
       :root {
         --bg: #000000;
         --text: #ffffff;
         --muted: #9ca3af;
         --border: rgba(255, 255, 255, 0.12);
         --border-soft: rgba(255, 255, 255, 0.08);
-        --font: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        --font: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+          sans-serif;
+        --font-serif: var(--font-newsreader), "Newsreader", Georgia, serif;
         /* Static fallback + bars (reduced motion, preview stripes) */
         --grad-headline: linear-gradient(
           90deg,
@@ -34,6 +23,7 @@
 
       html {
         height: 100%;
+        scroll-behavior: smooth;
       }
 
       body {
@@ -59,7 +49,7 @@
         box-sizing: border-box;
       }
 
-      /* ——— Header ——— */
+      /* ΓÇöΓÇöΓÇö Header ΓÇöΓÇöΓÇö */
       header {
         display: flex;
         align-items: center;
@@ -103,7 +93,7 @@
         opacity: 0.92;
       }
 
-      /* ——— Hero ——— first screen; ledger scrolls below */
+      /* ΓÇöΓÇöΓÇö Hero ΓÇöΓÇöΓÇö first screen; ledger scrolls below */
       .hero {
         display: flex;
         flex-direction: column;
@@ -137,7 +127,7 @@
         color: var(--text);
       }
 
-      /* Continuous blue → red → yellow flow (seamless loop via wide gradient + pan) */
+      /* Continuous blue ΓåÆ red ΓåÆ yellow flow (seamless loop via wide gradient + pan) */
       h1 .line2-wrap {
         display: block;
         min-height: 1.15em;
@@ -286,7 +276,7 @@
         height: 1.15rem;
       }
 
-      /* ——— Feature grid — what the audit app does (Credex MVP scope) ——— */
+      /* ΓÇöΓÇöΓÇö Feature grid ΓÇö what the audit app does (Credex MVP scope) ΓÇöΓÇöΓÇö */
       .features-section {
         width: 100%;
         padding: clamp(1.5rem, 4vw, 2.5rem) clamp(1.25rem, 5vw, 2.5rem) clamp(2rem, 5vw, 3rem);
@@ -397,7 +387,7 @@
         }
       }
 
-      /* Feature viz motion — subtle loops; disabled under prefers-reduced-motion */
+      /* Feature viz motion ΓÇö subtle loops; disabled under prefers-reduced-motion */
       @keyframes fc-viz-float {
         0%,
         100% {
@@ -779,20 +769,20 @@
         color: #fbbf24;
       }
 
-      /* ——— Reveal on scroll (insights + feature cards) ——— */
+      /* Reveal on scroll — keep content visible (opacity 1) so the page never looks “blank” if IO is late or blocked */
       #insights-section:not(.in-view) .insights-inner > h2,
       #insights-section:not(.in-view) .insights-lead,
       #insights-section:not(.in-view) .insights-stack {
-        opacity: 0;
+        opacity: 1;
       }
 
       #insights-section:not(.in-view) .insights-inner > h2,
       #insights-section:not(.in-view) .insights-lead {
-        transform: translateY(1rem);
+        transform: translateY(0.35rem);
       }
 
       #insights-section:not(.in-view) .insights-stack {
-        transform: translateY(0.65rem);
+        transform: translateY(0.25rem);
       }
 
       #insights-section.in-view .insights-inner > h2 {
@@ -821,8 +811,8 @@
 
       #what-it-does:not(.in-view) h2,
       #what-it-does:not(.in-view) .features-lead {
-        opacity: 0;
-        transform: translateY(1rem);
+        opacity: 1;
+        transform: translateY(0.35rem);
       }
 
       #what-it-does.in-view h2 {
@@ -841,15 +831,15 @@
           transform 0.48s cubic-bezier(0.33, 1, 0.68, 1) 0.06s;
       }
 
-      /* Feature cards: inner “boxes” (visual strip + text block) reveal per card when scrolled into view */
+      /* Feature cards: always readable; subtle offset until in-view */
       .feature-card:not(.feature-card--in-view) .feature-card-visual {
-        opacity: 0;
-        transform: translateY(0.65rem);
+        opacity: 1;
+        transform: translateY(0.35rem);
       }
 
       .feature-card:not(.feature-card--in-view) .feature-card-bottom {
-        opacity: 0;
-        transform: translateY(0.5rem);
+        opacity: 1;
+        transform: translateY(0.25rem);
       }
 
       .feature-card.feature-card--in-view .feature-card-visual {
@@ -951,7 +941,7 @@
         }
       }
 
-      /* ——— FY26 ledger — same surface as hero (no second “page”) ——— */
+      /* ΓÇöΓÇöΓÇö FY26 ledger ΓÇö same surface as hero (no second ΓÇ£pageΓÇ¥) ΓÇöΓÇöΓÇö */
       .ledger-section {
         width: 100%;
         background-color: var(--bg);
@@ -1005,8 +995,8 @@
         font-size: 1.22rem;
         font-weight: 500;
         color: #e5e7eb;
-        opacity: 0;
-        transform: translateY(12px);
+        opacity: 1;
+        transform: translateY(0);
         transition: opacity 0.45s ease, transform 0.45s ease;
       }
 
@@ -1052,8 +1042,8 @@
         align-items: baseline;
         gap: 1rem;
         flex-wrap: wrap;
-        opacity: 0;
-        transform: translateY(12px);
+        opacity: 1;
+        transform: translateY(0);
         transition: opacity 0.5s ease, transform 0.5s ease;
       }
 
@@ -1138,7 +1128,7 @@
         }
       }
 
-      /* ——— Current spend snapshot ——— */
+      /* ΓÇöΓÇöΓÇö Current spend snapshot ΓÇöΓÇöΓÇö */
       .insights-section {
         width: 100%;
         padding: clamp(2rem, 5vw, 3.5rem) clamp(1.25rem, 5vw, 2.5rem) clamp(3rem, 6vw, 4.5rem);
@@ -1324,597 +1314,3 @@
         color: #fff;
       }
 
-    </style>
-  </head>
-  <body>
-    <div class="shell">
-      <header>
-        <a class="logo" href="#audit" aria-label="Credex home">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-            <path d="M12 3L20 19H4L12 3Z" fill="currentColor" />
-          </svg>
-          Credex
-        </a>
-        <a class="header-cta" href="#audit">Run audit</a>
-      </header>
-
-      <section class="hero" id="audit">
-        <h1>
-          <span class="line1">Know your stack.</span>
-          <span class="line2-wrap" aria-label="Headline cycles between two phrases">
-            <span class="line2-inner" id="line2-typed" aria-live="polite"></span><span class="type-cursor" aria-hidden="true">|</span>
-          </span>
-        </h1>
-        <p class="sub">
-          For anyone paying for AI tools—teams, founders, or students. Rule-based audit, optional summary, a
-          report link you can send—no login.
-        </p>
-        <div class="cta-row">
-          <a class="btn-pill btn-pill-primary" id="cta-run-audit" href="#">
-            Run free audit
-            <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true">
-              <path d="M5 12h14M13 6l6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
-            </svg>
-          </a>
-          <a class="btn-pill btn-pill-secondary" id="cta-view-sample" href="#">View sample</a>
-        </div>
-      </section>
-
-      <section class="ledger-section" id="ledger-section" aria-labelledby="ledger-heading">
-        <div class="ledger-inner">
-          <div class="ledger-head">
-            <span id="ledger-heading">AI waste — individual contributor ledger</span>
-            <span class="ledger-source"
-              ><a href="https://www.getverbal.ai/" target="_blank" rel="noopener noreferrer">Verbal</a></span
-            >
-          </div>
-          <div class="ledger-rows">
-            <div class="ledger-row" data-ledger-row data-amount="600">
-              <span class="ledger-label">Stacked subscriptions (ChatGPT + Claude + Copilot)</span>
-              <span class="ledger-leader" aria-hidden="true"></span>
-              <span class="ledger-amt"><span data-count>$0</span></span>
-            </div>
-            <div class="ledger-row" data-ledger-row data-amount="1920">
-              <span class="ledger-label">Max-plan premium over mid-tier</span>
-              <span class="ledger-leader" aria-hidden="true"></span>
-              <span class="ledger-amt"><span data-count>$0</span></span>
-            </div>
-            <div class="ledger-row" data-ledger-row data-amount="4800">
-              <span class="ledger-label">Wrong-model usage (premium for mini-class tasks)</span>
-              <span class="ledger-leader" aria-hidden="true"></span>
-              <span class="ledger-amt"><span data-count>$0</span></span>
-            </div>
-            <div class="ledger-row" data-ledger-row data-amount="2400">
-              <span class="ledger-label">Idle / forgotten API budget</span>
-              <span class="ledger-leader" aria-hidden="true"></span>
-              <span class="ledger-amt"><span data-count>$0</span></span>
-            </div>
-            <div class="ledger-row" data-ledger-row data-amount="1800">
-              <span class="ledger-label">Failed re-runs &amp; retries</span>
-              <span class="ledger-leader" aria-hidden="true"></span>
-              <span class="ledger-amt"><span data-count>$0</span></span>
-            </div>
-            <div class="ledger-row" data-ledger-row data-amount="2880">
-              <span class="ledger-label">Duplicate-tool overlap</span>
-              <span class="ledger-leader" aria-hidden="true"></span>
-              <span class="ledger-amt"><span data-count>$0</span></span>
-            </div>
-          </div>
-          <div class="ledger-divider">
-            <div class="ledger-total-row" id="ledger-total-block">
-              <span class="ledger-total-label">Total waste / yr</span>
-              <span class="ledger-total-num-wrap">
-                <span class="ledger-total-num" id="ledger-total-num" aria-live="polite">$0</span>
-              </span>
-            </div>
-          </div>
-          <p class="ledger-foot">
-            Annual category totals from
-            <a href="https://www.getverbal.ai/" target="_blank" rel="noopener noreferrer">Verbal</a>.
-          </p>
-        </div>
-      </section>
-
-      <section class="insights-section" id="insights-section" aria-labelledby="insights-heading">
-        <div class="insights-inner">
-          <h2 id="insights-heading">Current spend</h2>
-          <p class="insights-lead">Illustrative model mix—then the same workload after rule-based swaps (illustrative).</p>
-          <div class="insights-stack">
-            <div class="insights-panel insights-panel--current" aria-label="Current monthly spend by model">
-              <h3 class="insights-panel-title">By model</h3>
-              <div class="insights-row">
-                <span class="insights-model">Claude 3.5 Sonnet</span>
-                <div class="insights-bar-track"><div class="insights-bar insights-bar--current" style="width: 100%"></div></div>
-                <span class="insights-price">$1,240</span>
-              </div>
-              <div class="insights-row">
-                <span class="insights-model">GPT-4o</span>
-                <div class="insights-bar-track"><div class="insights-bar insights-bar--current-muted" style="width: 71.8%"></div></div>
-                <span class="insights-price">$890</span>
-              </div>
-              <div class="insights-row">
-                <span class="insights-model">Claude 3.5 Haiku</span>
-                <div class="insights-bar-track"><div class="insights-bar insights-bar--current-muted" style="width: 25.8%"></div></div>
-                <span class="insights-price">$320</span>
-              </div>
-              <div class="insights-row">
-                <span class="insights-model">GPT-4o-mini</span>
-                <div class="insights-bar-track"><div class="insights-bar insights-bar--current-muted" style="width: 6.9%"></div></div>
-                <span class="insights-price">$85</span>
-              </div>
-              <div class="insights-total insights-total--current">
-                <span>Total/mo</span>
-                <strong class="insights-total-amount insights-total-amount--before">$2,535</strong>
-              </div>
-            </div>
-
-            <div class="insights-after" aria-label="Optimized monthly spend after Credex-style changes">
-              <h3 class="insights-panel-title insights-panel-title--after">After Credex</h3>
-              <div class="insights-row">
-                <span class="insights-model">Claude 3.5 Haiku</span>
-                <div class="insights-bar-track"><div class="insights-bar insights-bar--opt" style="width: 100%"></div></div>
-                <span class="insights-price">$640</span>
-              </div>
-              <div class="insights-row">
-                <span class="insights-model">GPT-4o-mini</span>
-                <div class="insights-bar-track"><div class="insights-bar insights-bar--opt" style="width: 27.3%"></div></div>
-                <span class="insights-price">$175</span>
-              </div>
-              <div class="insights-row">
-                <span class="insights-model">Claude 3.5 Sonnet</span>
-                <div class="insights-bar-track"><div class="insights-bar insights-bar--opt-muted" style="width: 43.75%"></div></div>
-                <span class="insights-price">$280</span>
-              </div>
-              <div class="insights-row">
-                <span class="insights-model">GPT-4o</span>
-                <div class="insights-bar-track"><div class="insights-bar insights-bar--opt-muted" style="width: 25%"></div></div>
-                <span class="insights-price">$160</span>
-              </div>
-              <div class="insights-total insights-total--after">
-                <span>Total/mo</span><strong>$1,255</strong>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="features-section features-section--bottom" id="what-it-does" aria-labelledby="features-heading">
-        <div class="features-inner">
-          <h2 id="features-heading">From your stack to numbers you can forward</h2>
-          <p class="features-lead">
-            Free AI spend audit—no login.
-            <br />
-            One stack snapshot, defensible savings math, a report link for finance or your team.
-          </p>
-          <div class="features-grid">
-            <article class="feature-card feature-card--a">
-              <div class="feature-card-visual" aria-hidden="true">
-                <svg viewBox="0 0 200 112" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect class="fc-live-metric" x="8" y="8" width="56" height="28" rx="4" fill="rgba(56,189,248,0.12)" stroke="rgba(56,189,248,0.35)" />
-                  <text x="14" y="22" fill="#94a3b8" font-size="9" font-family="system-ui, sans-serif">Spend</text>
-                  <text x="14" y="32" fill="#e2e8f0" font-size="11" font-family="system-ui, sans-serif" font-weight="600">$2.8k</text>
-                  <rect class="fc-live-metric" x="72" y="8" width="56" height="28" rx="4" fill="rgba(167,139,250,0.1)" stroke="rgba(167,139,250,0.35)" />
-                  <text x="78" y="22" fill="#94a3b8" font-size="9" font-family="system-ui, sans-serif">Tools</text>
-                  <text x="78" y="32" fill="#e2e8f0" font-size="11" font-family="system-ui, sans-serif" font-weight="600">6</text>
-                  <rect class="fc-live-metric" x="136" y="8" width="56" height="28" rx="4" fill="rgba(74,222,128,0.1)" stroke="rgba(74,222,128,0.35)" />
-                  <text x="142" y="22" fill="#94a3b8" font-size="9" font-family="system-ui, sans-serif">Save</text>
-                  <text x="142" y="32" fill="#4ade80" font-size="11" font-family="system-ui, sans-serif" font-weight="600">18%</text>
-                  <rect class="fc-live-frame" x="12" y="46" width="176" height="54" rx="6" fill="rgba(0,0,0,0.35)" stroke="rgba(255,255,255,0.08)" />
-                  <path
-                    class="fc-live-line"
-                    d="M22 88 L44 72 L68 78 L92 58 L118 64 L142 48 L178 52"
-                    stroke="url(#viz-a-line)"
-                    stroke-width="2.2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    fill="none"
-                  />
-                  <path
-                    class="fc-live-fill"
-                    d="M22 88 L44 72 L68 78 L92 58 L118 64 L142 48 L178 52 V96 H22 Z"
-                    fill="url(#viz-a-fill)"
-                    opacity="0.35"
-                  />
-                  <circle class="fc-live-dot" cx="178" cy="52" r="4" fill="#34d399" />
-                  <defs>
-                    <linearGradient id="viz-a-line" x1="22" y1="58" x2="178" y2="88" gradientUnits="userSpaceOnUse">
-                      <stop stop-color="#38bdf8" />
-                      <stop offset="1" stop-color="#34d399" />
-                    </linearGradient>
-                    <linearGradient id="viz-a-fill" x1="22" y1="48" x2="178" y2="96" gradientUnits="userSpaceOnUse">
-                      <stop stop-color="#38bdf8" stop-opacity="0.5" />
-                      <stop offset="1" stop-color="#34d399" stop-opacity="0" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </div>
-              <div class="feature-card-bottom">
-                <div class="feature-card-head">
-                  <span class="feature-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                      <path d="M4 19h16M4 15l4-4 4 4 4-6 4 4" />
-                    </svg>
-                  </span>
-                  <h3>Log your AI stack</h3>
-                </div>
-                <p class="feature-card-desc">
-                  Tools, spend, seats, use case—saved if you reload.
-                </p>
-              </div>
-            </article>
-
-            <article class="feature-card feature-card--b">
-              <div class="feature-card-visual" aria-hidden="true">
-                <svg viewBox="0 0 200 112" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect class="fc-live-panel" x="16" y="16" width="168" height="80" rx="8" fill="rgba(0,0,0,0.35)" stroke="rgba(74,222,128,0.25)" />
-                  <path class="fc-live-dashes" d="M32 36h96M32 52h120M32 68h72" stroke="#64748b" stroke-width="1.5" stroke-linecap="round" />
-                  <rect class="fc-live-bar" x="40" y="78" width="28" height="22" rx="3" fill="rgba(74,222,128,0.35)" />
-                  <rect class="fc-live-bar" x="76" y="72" width="28" height="28" rx="3" fill="rgba(74,222,128,0.55)" />
-                  <rect class="fc-live-bar" x="112" y="64" width="28" height="36" rx="3" fill="rgba(74,222,128,0.75)" />
-                  <rect class="fc-live-bar" x="148" y="76" width="28" height="24" rx="3" fill="rgba(74,222,128,0.4)" />
-                  <circle class="fc-live-ring" cx="168" cy="28" r="14" fill="rgba(74,222,128,0.15)" stroke="#4ade80" stroke-width="1.5" />
-                  <path class="fc-live-check" d="M162 28l4 4 8-10" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-              </div>
-              <div class="feature-card-bottom">
-                <div class="feature-card-head">
-                  <span class="feature-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <rect x="4" y="4" width="16" height="16" rx="2" />
-                      <path d="M9 9h6M9 13h4M9 17h6" stroke-linecap="round" />
-                    </svg>
-                  </span>
-                  <h3>Rule-based audit</h3>
-                </div>
-                <p class="feature-card-desc">
-                  Plan fit, cheaper tiers, alternatives—priced from PRICING_DATA.md, not vibes.
-                </p>
-              </div>
-            </article>
-
-            <article class="feature-card feature-card--c">
-              <div class="feature-card-visual" aria-hidden="true">
-                <svg viewBox="0 0 200 112" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <rect class="fc-live-panel" x="24" y="20" width="152" height="72" rx="10" fill="#0f1114" stroke="rgba(167,139,250,0.45)" stroke-width="1.5" />
-                  <rect class="fc-live-skeleton" x="36" y="32" width="128" height="8" rx="2" fill="rgba(148,163,184,0.25)" />
-                  <rect class="fc-live-skeleton" x="36" y="46" width="96" height="6" rx="2" fill="rgba(148,163,184,0.15)" />
-                  <rect class="fc-live-skeleton" x="36" y="58" width="112" height="6" rx="2" fill="rgba(148,163,184,0.15)" />
-                  <circle class="fc-live-ring" cx="156" cy="38" r="16" fill="rgba(167,139,250,0.25)" />
-                  <path class="fc-live-cross" d="M148 38h16M156 30v16" stroke="#c4b5fd" stroke-width="2" stroke-linecap="round" />
-                </svg>
-              </div>
-              <div class="feature-card-bottom">
-                <div class="feature-card-head">
-                  <span class="feature-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" stroke-linecap="round" />
-                      <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" stroke-linecap="round" />
-                    </svg>
-                  </span>
-                  <h3>Report in one link</h3>
-                </div>
-                <p class="feature-card-desc">
-                  One public report page with a rich link preview—no personal details on it.
-                </p>
-              </div>
-            </article>
-
-            <article class="feature-card feature-card--d">
-              <div class="feature-card-visual" aria-hidden="true">
-                <svg viewBox="0 0 200 112" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <g class="fc-live-mail">
-                    <rect x="40" y="28" width="120" height="68" rx="8" fill="#0f1114" stroke="rgba(251,191,36,0.45)" stroke-width="1.5" />
-                    <path class="fc-live-mail-edge" d="M40 36l60 38 60-38" stroke="rgba(251,191,36,0.5)" stroke-width="1.5" stroke-linecap="round" />
-                  </g>
-                  <rect class="fc-live-skeleton" x="56" y="54" width="88" height="8" rx="2" fill="rgba(148,163,184,0.2)" />
-                  <rect class="fc-live-skeleton" x="56" y="68" width="64" height="6" rx="2" fill="rgba(148,163,184,0.12)" />
-                  <circle class="fc-live-stamp" cx="158" cy="44" r="18" fill="rgba(251,191,36,0.15)" stroke="#fbbf24" stroke-width="1.5" />
-                  <path class="fc-live-plus" d="M152 44h12M158 38v12" stroke="#fcd34d" stroke-width="2" stroke-linecap="round" />
-                </svg>
-              </div>
-              <div class="feature-card-bottom">
-                <div class="feature-card-head">
-                  <span class="feature-icon" aria-hidden="true">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
-                      <path d="m22 6-10 7L2 6" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                  </span>
-                  <h3>Email after value</h3>
-                </div>
-                <p class="feature-card-desc">
-                  Email optional after results—confirmation plus summary when they opt in.
-                </p>
-              </div>
-            </article>
-          </div>
-        </div>
-      </section>
-    </div>
-    <script>
-      (function () {
-        var PHRASES = ["Rule-based audit.", "A report link you can send."];
-        var wrap = document.querySelector("h1 .line2-wrap");
-        var inner = document.querySelector("#line2-typed");
-        if (!wrap || !inner) return;
-
-        var reduced =
-          window.matchMedia &&
-          window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-        if (reduced) {
-          inner.textContent = PHRASES[0];
-          return;
-        }
-
-        var typingTimeoutId = null;
-        var phraseIndex = 0;
-        var charIndex = 0;
-        var msPerChar = 48;
-        var msPerDelete = 34;
-        var holdBeforeDeleteMs = 2200;
-        var gapBeforeNextPhraseMs = 380;
-        var startDelayMs = 240;
-
-        function clearTimer() {
-          if (typingTimeoutId !== null) {
-            window.clearTimeout(typingTimeoutId);
-            typingTimeoutId = null;
-          }
-        }
-
-        function finishTypingNow() {
-          clearTimer();
-          inner.textContent = PHRASES[0];
-          phraseIndex = 0;
-          charIndex = PHRASES[0].length;
-          wrap.classList.add("typing-done");
-        }
-
-        function stopHeadlineGradient() {
-          finishTypingNow();
-          wrap.classList.remove("line2-wrap--flow");
-          wrap.classList.add("line2-wrap--stopped");
-        }
-
-        function startTypingPhrase() {
-          charIndex = 0;
-          inner.textContent = "";
-          wrap.classList.remove("typing-done");
-          typeForward();
-        }
-
-        function typeForward() {
-          var phrase = PHRASES[phraseIndex];
-          if (charIndex >= phrase.length) {
-            wrap.classList.add("typing-done");
-            typingTimeoutId = window.setTimeout(function () {
-              wrap.classList.remove("typing-done");
-              deleteBackward();
-            }, holdBeforeDeleteMs);
-            return;
-          }
-          inner.textContent += phrase.charAt(charIndex);
-          charIndex += 1;
-          typingTimeoutId = window.setTimeout(typeForward, msPerChar);
-        }
-
-        function deleteBackward() {
-          if (inner.textContent.length <= 0) {
-            phraseIndex = (phraseIndex + 1) % PHRASES.length;
-            typingTimeoutId = window.setTimeout(startTypingPhrase, gapBeforeNextPhraseMs);
-            return;
-          }
-          inner.textContent = inner.textContent.slice(0, -1);
-          typingTimeoutId = window.setTimeout(deleteBackward, msPerDelete);
-        }
-
-        typingTimeoutId = window.setTimeout(function () {
-          typingTimeoutId = null;
-          wrap.classList.add("line2-wrap--flow");
-          startTypingPhrase();
-        }, startDelayMs);
-
-        var runAudit = document.getElementById("cta-run-audit");
-        var viewSample = document.getElementById("cta-view-sample");
-        [runAudit, viewSample].forEach(function (el) {
-          if (!el) return;
-          el.addEventListener("click", function () {
-            stopHeadlineGradient();
-          });
-        });
-      })();
-    </script>
-    <script>
-      (function () {
-        var ledgerSection = document.getElementById("ledger-section");
-        if (!ledgerSection) return;
-
-        var prefersReduced =
-          window.matchMedia &&
-          window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-        function fmtCurrency(n) {
-          return "$" + Math.round(n).toLocaleString("en-US");
-        }
-
-        function delay(ms) {
-          return new Promise(function (resolve) {
-            window.setTimeout(resolve, ms);
-          });
-        }
-
-        function countUp(el, target, durationMs) {
-          return new Promise(function (resolve) {
-            var start = performance.now();
-            function frame(now) {
-              var t = Math.min(1, (now - start) / durationMs);
-              var eased = 1 - Math.pow(1 - t, 3);
-              var val = Math.round(target * eased);
-              el.textContent = fmtCurrency(val);
-              if (t < 1) {
-                requestAnimationFrame(frame);
-              } else {
-                el.textContent = fmtCurrency(target);
-                resolve();
-              }
-            }
-            requestAnimationFrame(frame);
-          });
-        }
-
-        function showStaticLedger() {
-          var rows = ledgerSection.querySelectorAll("[data-ledger-row]");
-          for (var i = 0; i < rows.length; i++) {
-            rows[i].classList.add("ledger-row--visible");
-            var amtEl = rows[i].querySelector("[data-count]");
-            var target = parseInt(rows[i].getAttribute("data-amount"), 10);
-            if (amtEl) amtEl.textContent = fmtCurrency(target);
-          }
-          var totalBlock = document.getElementById("ledger-total-block");
-          var totalNum = document.getElementById("ledger-total-num");
-          if (totalBlock) totalBlock.classList.add("ledger-total-row--visible");
-          if (totalNum) totalNum.textContent = fmtCurrency(14400);
-        }
-
-        async function runLedgerSequence() {
-          var rows = ledgerSection.querySelectorAll("[data-ledger-row]");
-          for (var j = 0; j < rows.length; j++) {
-            rows[j].classList.add("ledger-row--visible");
-            var amtEl = rows[j].querySelector("[data-count]");
-            var target = parseInt(rows[j].getAttribute("data-amount"), 10);
-            if (amtEl) await countUp(amtEl, target, 620);
-            await delay(115);
-          }
-          await delay(220);
-          var totalBlock = document.getElementById("ledger-total-block");
-          var totalNum = document.getElementById("ledger-total-num");
-          if (totalBlock) totalBlock.classList.add("ledger-total-row--visible");
-          if (totalNum) await countUp(totalNum, 14400, 1050);
-        }
-
-        if (prefersReduced) {
-          showStaticLedger();
-          return;
-        }
-
-        var played = false;
-        var io = new IntersectionObserver(
-          function (entries) {
-            entries.forEach(function (entry) {
-              if (!entry.isIntersecting || played) return;
-              played = true;
-              io.disconnect();
-              runLedgerSequence();
-            });
-          },
-          { threshold: 0.2, rootMargin: "0px 0px -5% 0px" }
-        );
-        io.observe(ledgerSection);
-      })();
-    </script>
-    <script>
-      (function () {
-        var prefersReduced =
-          window.matchMedia &&
-          window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-        function revealSection(el) {
-          if (!el) return;
-          if (prefersReduced) {
-            el.classList.add("in-view");
-            return;
-          }
-          var io = new IntersectionObserver(
-            function (entries) {
-              entries.forEach(function (entry) {
-                if (!entry.isIntersecting) return;
-                entry.target.classList.add("in-view");
-                io.unobserve(entry.target);
-              });
-            },
-            { threshold: 0.12, rootMargin: "0px 0px -6% 0px" }
-          );
-          io.observe(el);
-        }
-
-        (function setupInsightsSpendSequence() {
-          var insights = document.getElementById("insights-section");
-          if (!insights) return;
-          if (prefersReduced) {
-            insights.classList.add("in-view", "insights-sequence-cut", "insights-sequence-after");
-            return;
-          }
-
-          var cutT = null;
-          var afterT = null;
-
-          function clearSequenceState() {
-            if (cutT != null) {
-              window.clearTimeout(cutT);
-              cutT = null;
-            }
-            if (afterT != null) {
-              window.clearTimeout(afterT);
-              afterT = null;
-            }
-            insights.classList.remove("insights-sequence-cut", "insights-sequence-after");
-          }
-
-          function startSpendSequence() {
-            clearSequenceState();
-            insights.classList.add("in-view");
-            cutT = window.setTimeout(function () {
-              cutT = null;
-              insights.classList.add("insights-sequence-cut");
-            }, 900);
-            afterT = window.setTimeout(function () {
-              afterT = null;
-              insights.classList.add("insights-sequence-after");
-            }, 1750);
-          }
-
-          var io = new IntersectionObserver(
-            function (entries) {
-              entries.forEach(function (entry) {
-                if (entry.isIntersecting) {
-                  startSpendSequence();
-                } else {
-                  clearSequenceState();
-                }
-              });
-            },
-            { threshold: 0.12, rootMargin: "0px 0px -6% 0px" }
-          );
-          io.observe(insights);
-        })();
-
-        revealSection(document.getElementById("what-it-does"));
-
-        var featuresWrap = document.getElementById("what-it-does");
-        if (featuresWrap) {
-          var featureCards = featuresWrap.querySelectorAll(".feature-card");
-          if (prefersReduced) {
-            featureCards.forEach(function (card) {
-              card.classList.add("feature-card--in-view");
-            });
-          } else {
-            var cardIo = new IntersectionObserver(
-              function (entries) {
-                entries.forEach(function (entry) {
-                  if (!entry.isIntersecting) return;
-                  entry.target.classList.add("feature-card--in-view");
-                  cardIo.unobserve(entry.target);
-                });
-              },
-              { threshold: 0.15, rootMargin: "0px 0px -12% 0px" }
-            );
-            featureCards.forEach(function (card) {
-              cardIo.observe(card);
-            });
-          }
-        }
-      })();
-    </script>
-  </body>
-</html>
