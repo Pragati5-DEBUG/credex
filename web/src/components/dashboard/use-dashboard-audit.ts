@@ -14,14 +14,16 @@ export function useDashboardAudit() {
   const [audit, setAudit] = useState<AuditResult | null>(null);
 
   useEffect(() => {
-    if (demo) {
-      setPayload(DEMO_AUDIT_PAYLOAD);
-      setAudit(runAudit(DEMO_AUDIT_PAYLOAD));
-      return;
-    }
-    const p = readSpendPayloadFromBrowserStorage();
-    setPayload(p);
-    setAudit(p?.tools?.length ? runAudit(p) : null);
+    queueMicrotask(() => {
+      if (demo) {
+        setPayload(DEMO_AUDIT_PAYLOAD);
+        setAudit(runAudit(DEMO_AUDIT_PAYLOAD));
+        return;
+      }
+      const p = readSpendPayloadFromBrowserStorage();
+      setPayload(p);
+      setAudit(p?.tools?.length ? runAudit(p) : null);
+    });
   }, [demo]);
 
   return {

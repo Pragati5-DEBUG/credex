@@ -1,6 +1,6 @@
 "use client";
 
-import { CREDIT_VENDOR_NAME, PRODUCT_NAME } from "@/lib/product-brand";
+import { CREDEX_CONSULTATION_URL, PRODUCT_NAME } from "@/lib/product-brand";
 import { DEMO_AUDIT_PAYLOAD } from "@/lib/audit-demo-payload";
 import { readSpendPayloadFromBrowserStorage } from "@/lib/audit-storage";
 import { PRIMARY_USE_CASE_OPTIONS, VENDOR_LABELS } from "@/lib/audit-intake-config";
@@ -16,7 +16,7 @@ function parseSpend(s: string) {
   return Number.isFinite(n) ? n : NaN;
 }
 
-function useCaseLabel(v: string) {
+function formatPrimaryUseCase(v: string) {
   return PRIMARY_USE_CASE_OPTIONS.find((o) => o.value === v)?.label ?? v;
 }
 
@@ -84,40 +84,28 @@ export function AuditSummaryClient() {
   const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">("idle");
 
   useEffect(() => {
-    if (demo) {
-      setPayload(DEMO_AUDIT_PAYLOAD);
-      setAudit(runAudit(DEMO_AUDIT_PAYLOAD));
-      return;
-    }
-    const p = readSpendPayloadFromBrowserStorage();
-    if (p?.tools?.length) {
-      setPayload(p);
-      setAudit(runAudit(p));
-    } else {
-      setPayload(null);
-      setAudit(null);
-    }
+    queueMicrotask(() => {
+      if (demo) {
+        setPayload(DEMO_AUDIT_PAYLOAD);
+        setAudit(runAudit(DEMO_AUDIT_PAYLOAD));
+        return;
+      }
+      const p = readSpendPayloadFromBrowserStorage();
+      if (p?.tools?.length) {
+        setPayload(p);
+        setAudit(runAudit(p));
+      } else {
+        setPayload(null);
+        setAudit(null);
+      }
+    });
   }, [demo]);
-
-  useEffect(() => {
-    setCopyStatus("idle");
-  }, [shareUrl]);
 
   const combined = audit?.combinedCurrentMonthlyUsd ?? 0;
   const savings = audit?.totalMonthlySavingsUsd ?? 0;
   const afterMonthly = Math.max(0, combined - savings);
   const highSavingsCreditPromo = audit && audit.savingsBand === "high";
-
-  const bandNote = useMemo(() => {
-    if (!audit) return null;
-    if (audit.savingsBand === "high") {
-      return `Modeled savings are above $500/mo — ${CREDIT_VENDOR_NAME} credits can sometimes capture more than list-price tweaks alone.`;
-    }
-    if (audit.savingsBand === "low") {
-      return "Under $100/mo modeled savings — you are likely already close to public list; we will not inflate numbers.";
-    }
-    return null;
-  }, [audit]);
+  const spendingWellBand = audit && audit.savingsBand === "low";
 
   const hasPayload = !!(payload?.tools?.length);
   const hasAuditLines = !!(audit?.lines.length);
@@ -142,6 +130,7 @@ export function AuditSummaryClient() {
   const onCreateShareLink = useCallback(async () => {
     if (!snapshot) return;
     setShareError(null);
+    setCopyStatus("idle");
     setShareBusy(true);
     try {
       const res = await fetch("/api/share", {
@@ -207,6 +196,7 @@ export function AuditSummaryClient() {
             emailed: Boolean(j.emailed),
             emailNote: typeof j.emailNote === "string" ? j.emailNote : undefined,
           });
+          setCopyStatus("idle");
           setShareUrl(j.shareUrl);
         }
       } catch {
@@ -239,8 +229,7 @@ export function AuditSummaryClient() {
               <p className="text-xs font-semibold uppercase tracking-wider text-violet-400/90">Demo</p>
               <h1 className="mt-1 text-2xl font-semibold tracking-tight text-white sm:text-3xl">Sample results</h1>
               <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-500">
-                Same rule engine as a real run — numbers trace to{" "}
-                <span className="text-zinc-400">PRICING_DATA.md</span>.
+                Same rule engine as a real run — numbers trace to vendor-published list anchors in the engine.
               </p>
             </>
           ) : (
@@ -288,7 +277,7 @@ export function AuditSummaryClient() {
               {payload.primaryUseCase ? (
                 <span className="rounded-lg border border-white/[0.08] bg-[#0b0b0f] px-3 py-1.5 text-xs text-zinc-300">
                   <span className="text-zinc-600">Use case</span>{" "}
-                  <span className="font-semibold text-white">{useCaseLabel(payload.primaryUseCase)}</span>
+                  <span className="font-semibold text-white">{formatPrimaryUseCase(payload.primaryUseCase)}</span>
                 </span>
               ) : null}
             </div>
@@ -390,19 +379,25 @@ export function AuditSummaryClient() {
               </div>
             </section>
 
-            {bandNote ? (
-              <p className="mb-6 rounded-xl border border-white/[0.06] bg-violet-500/[0.04] px-4 py-3 text-center text-xs leading-relaxed text-zinc-400">
-                {bandNote}
-              </p>
+            {spendingWellBand ? (
+              <div className="mb-8 rounded-xl border border-emerald-500/25 bg-emerald-500/[0.07] px-4 py-4 sm:px-6">
+                <p className="text-lg font-semibold leading-tight text-emerald-50 sm:text-xl">
+                  You&apos;re spending well at modeled list anchors.
+                </p>
+              </div>
             ) : null}
 
             {highSavingsCreditPromo ? (
-              <div className="mb-8 rounded-xl border border-amber-500/25 bg-amber-500/[0.08] p-4 sm:p-5">
-                <p className="text-xs font-bold uppercase tracking-wider text-amber-200/90">{CREDIT_VENDOR_NAME}</p>
-                <p className="mt-1 text-sm leading-relaxed text-amber-100/90">
-                  Large modeled savings — discounted AI infrastructure credits may beat retail alone. Capture email after
-                  value in the shipped MVP, then book a consult.
-                </p>
+              <div className="mb-10 flex justify-center px-2">
+                <a
+                  href={CREDEX_CONSULTATION_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-center text-xl font-semibold tracking-tight text-zinc-100 underline decoration-violet-500/45 decoration-2 underline-offset-[10px] transition hover:text-white hover:decoration-violet-400/80 sm:text-2xl md:text-3xl"
+                  aria-label={`Book consultation (opens ${CREDEX_CONSULTATION_URL})`}
+                >
+                  Book consultation
+                </a>
               </div>
             ) : null}
 
@@ -456,8 +451,16 @@ export function AuditSummaryClient() {
                             />
                           </div>
                         ) : null}
-                        <p className="mt-3 text-sm leading-snug text-violet-200/90">{line.recommendedAction}</p>
-                        <p className="mt-2 text-xs leading-relaxed text-zinc-600">{line.reasonOneLiner}</p>
+                        {line.estimatedMonthlySavingsUsd > 0 ? (
+                          <p className="mt-5 text-[0.7rem] font-bold uppercase tracking-[0.14em] text-violet-400/95">
+                            Reason to switch
+                          </p>
+                        ) : null}
+                        <p
+                          className={`text-base font-medium leading-relaxed text-zinc-50 sm:text-lg ${line.estimatedMonthlySavingsUsd > 0 ? "mt-2" : "mt-4"}`}
+                        >
+                          {line.recommendedAction}
+                        </p>
                       </div>
                     </li>
                   );
@@ -583,26 +586,6 @@ export function AuditSummaryClient() {
 
         {/* Actions — Grafient-style */}
         <div className="mt-10 space-y-3 border-t border-white/[0.06] pt-8">
-          {(hasPayload || demo) && (
-            <Link
-              href={demo ? "/dashboard?demo=1" : "/dashboard"}
-              className="flex w-full items-center justify-center gap-2 rounded-xl border border-violet-500/30 bg-violet-600/20 py-3.5 text-sm font-semibold text-violet-100 transition hover:border-violet-400/40 hover:bg-violet-600/30"
-            >
-              Open spend dashboard
-              <span className="text-violet-300/80" aria-hidden>
-                →
-              </span>
-            </Link>
-          )}
-
-          {!demo && (
-            <Link
-              href="/#insights-section"
-              className="flex w-full items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.04] py-3 text-sm font-medium text-zinc-200 hover:bg-white/[0.07]"
-            >
-              View landing insights
-            </Link>
-          )}
           {demo && (
             <Link
               href="/#ledger-section"

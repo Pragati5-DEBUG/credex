@@ -8,10 +8,13 @@ import type {
 import { VENDOR_LABELS } from "@/lib/audit-intake-config";
 import {
   listTargetPlansForVendor,
-  normalizePlanLabel,
   resolveRetailForPlan,
 } from "./pricing-catalog";
 import { crossVendorFloors } from "./cross-vendor";
+import {
+  SAVINGS_BAND_HIGH_MONTHLY_USD,
+  SAVINGS_BAND_LOW_MONTHLY_USD,
+} from "@/lib/savings-band-thresholds";
 
 export const MIN_MATERIAL_MONTHLY_SAVINGS_USD = 5;
 
@@ -52,8 +55,8 @@ function pickBestCandidate(
 }
 
 function savingsBand(total: number): AuditResult["savingsBand"] {
-  if (total >= 500) return "high";
-  if (total < 100) return "low";
+  if (total >= SAVINGS_BAND_HIGH_MONTHLY_USD) return "high";
+  if (total < SAVINGS_BAND_LOW_MONTHLY_USD) return "low";
   return "moderate";
 }
 
@@ -66,7 +69,6 @@ export function runAudit(payload: AuditSpendFormPayload): AuditResult {
   payload.tools.forEach((tool, index) => {
     const vendor = tool.vendorSlug as VendorSlug;
     const toolId = `tool-${index}`;
-    const planNorm = normalizePlanLabel(tool.plan ?? "");
     const seats = parseInt(String(tool.seats).trim(), 10);
     const current = parseSpendUsd(tool.monthlySpend ?? "");
 
@@ -134,7 +136,7 @@ export function runAudit(payload: AuditSpendFormPayload): AuditResult {
         action =
           "No fixed monthly list benchmark for this SKU (often Enterprise, API/usage, or unmatched plan text).";
         reason =
-          "We don’t model savings without a cited list anchor—see PRICING_DATA.md for what we can price.";
+          "We don’t model savings without a cited list anchor—only SKUs we can anchor to published vendor pricing.";
       } else {
         action =
           "No cheaper eligible SKU at list prices without breaking our seat/plan rules—or spend is already tight vs list.";

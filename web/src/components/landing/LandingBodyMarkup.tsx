@@ -1,4 +1,5 @@
 import { PRODUCT_NAME } from "@/lib/product-brand";
+import Link from "next/link";
 
 /* Auto-generated from legacy landing-preview.html */
 export function LandingBodyMarkup() {
@@ -6,13 +7,13 @@ export function LandingBodyMarkup() {
     <>
       <div className="shell">
             <header>
-              <a className="logo" href="/" aria-label={`${PRODUCT_NAME} home`}>
+              <Link className="logo" href="/" aria-label={`${PRODUCT_NAME} home`}>
                 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <path d="M12 3L20 19H4L12 3Z" fill="currentColor" />
                 </svg>
                 {PRODUCT_NAME}
-              </a>
-              <a className="header-cta" href="/audit">Run audit</a>
+              </Link>
+              <Link className="header-cta" href="/audit">Run audit</Link>
             </header>
       
             <section className="hero" id="hero">
@@ -27,15 +28,15 @@ export function LandingBodyMarkup() {
                 report link you can send—no login.
               </p>
               <div className="cta-row">
-                <a className="btn-pill btn-pill-primary" id="cta-run-audit" href="/audit">
+                <Link className="btn-pill btn-pill-primary" id="cta-run-audit" href="/audit">
                   Run free audit
                   <svg className="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
                     <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
-                </a>
-                <a className="btn-pill btn-pill-secondary" id="cta-view-sample" href="#ledger-section">
+                </Link>
+                <Link className="btn-pill btn-pill-secondary" id="cta-view-sample" href="/#ledger-section">
                   View sample
-                </a>
+                </Link>
               </div>
             </section>
       
@@ -43,9 +44,11 @@ export function LandingBodyMarkup() {
               <div className="ledger-inner">
                 <div className="ledger-head">
                   <span id="ledger-heading">AI waste — individual contributor ledger</span>
-                  <span className="ledger-source"
-                    ><a href="https://www.getverbal.ai/" target="_blank" rel="noopener noreferrer">Verbal</a></span
-                  >
+                  <span className="ledger-source">
+                    <a href="https://www.getverbal.ai/" target="_blank" rel="noopener noreferrer">
+                      Verbal
+                    </a>
+                  </span>
                 </div>
                 <div className="ledger-rows">
                   <div className="ledger-row" data-ledger-row data-amount="600">
@@ -246,7 +249,7 @@ export function LandingBodyMarkup() {
                         <h3>Rule-based audit</h3>
                       </div>
                       <p className="feature-card-desc">
-                        Plan fit, cheaper tiers, alternatives—priced from PRICING_DATA.md, not vibes.
+                        Plan fit, cheaper tiers, alternatives—priced from vendor list anchors, not vibes.
                       </p>
                     </div>
                   </article>

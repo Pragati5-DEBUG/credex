@@ -69,10 +69,11 @@ export function AuditIntakeClient() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem(AUDIT_STACK_STORAGE_KEY);
-      if (!raw) return;
-      const parsed = JSON.parse(raw) as Record<string, unknown>;
+    queueMicrotask(() => {
+      try {
+        const raw = localStorage.getItem(AUDIT_STACK_STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw) as Record<string, unknown>;
       if (parsed.version === 2 && Array.isArray(parsed.tools)) {
         const t = parsed.tools as Omit<AuditToolLine, "id">[];
         setTeamSize(typeof parsed.teamSize === "string" ? parsed.teamSize : "");
@@ -137,6 +138,7 @@ export function AuditIntakeClient() {
     } catch {
       /* ignore */
     }
+    });
   }, []);
 
   const persist = useCallback((nextRows: AuditToolLine[], ts: string, pu: PrimaryUseCase | "") => {

@@ -24,11 +24,16 @@ function isValidEmail(s: string): boolean {
 
 type SendEmailResult = { sent: true } | { sent: false; reason: string };
 
+function escapeHtmlAttr(s: string): string {
+  return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
 async function sendLeadEmail(to: string, shareUrl: string): Promise<SendEmailResult> {
   const key = process.env.RESEND_API_KEY?.trim();
   if (!key) return { sent: false, reason: "RESEND_API_KEY is not set in web/.env.local" };
   const from =
     process.env.RESEND_FROM?.trim() || `${PRODUCT_NAME.replace(/"/g, "")} <onboarding@resend.dev>`;
+
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
@@ -36,7 +41,9 @@ async function sendLeadEmail(to: string, shareUrl: string): Promise<SendEmailRes
       from,
       to: [to],
       subject: `Your ${PRODUCT_NAME} audit link`,
-      html: `<p>Thanks — here is your read-only report:</p><p><a href="${shareUrl}">${shareUrl}</a></p><p style="color:#666;font-size:12px">Rule-based snapshot only; not financial advice.</p>`,
+      html:
+        `<p>Thanks — here is your read-only report:</p><p><a href="${escapeHtmlAttr(shareUrl)}">${escapeHtmlAttr(shareUrl)}</a></p>` +
+        `<p style="color:#666;font-size:12px;margin-top:14px">Rule-based snapshot only; not financial advice.</p>`,
     }),
   });
   const raw = await res.text();
@@ -138,6 +145,7 @@ export async function POST(req: NextRequest) {
 
   const origin = appOrigin();
   const shareUrl = `${origin}/r/${shareId}`;
+
   const emailResult = await sendLeadEmail(email, shareUrl);
 
   return NextResponse.json({

@@ -1,6 +1,6 @@
 /**
  * Conservative cross-vendor suggestions: same *category* for the stated primary use case,
- * compared on **list prices** only (see PRICING_DATA.md).
+ * compared on **list prices** only (vendor-published anchors in the pricing catalog).
  */
 import type { PrimaryUseCase, VendorSlug } from "@/types/audit";
 import { minListedMonthlyAcrossVendor } from "./pricing-catalog";
@@ -77,7 +77,7 @@ function reasonFor(
   to: VendorSlug,
 ): string {
   if (useCase === "coding") {
-    return `For coding, ${label(to)} is in the same audit bucket as ${label(from)}; compare features, then decide—savings are from published list prices (see PRICING_DATA.md).`;
+    return `For coding, ${label(to)} is in the same audit bucket as ${label(from)}; compare features, then decide—savings here use published list prices only.`;
   }
   if (useCase === "writing") {
     return `For writing workloads, ${label(to)} is treated as a comparable chat workspace in our rules; confirm tone, privacy, and connectors before switching.`;
