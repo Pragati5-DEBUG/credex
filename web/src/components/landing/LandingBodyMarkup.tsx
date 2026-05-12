@@ -1,14 +1,16 @@
+import { PRODUCT_NAME } from "@/lib/product-brand";
+
 /* Auto-generated from legacy landing-preview.html */
 export function LandingBodyMarkup() {
   return (
     <>
       <div className="shell">
             <header>
-              <a className="logo" href="/" aria-label="Credex home">
+              <a className="logo" href="/" aria-label={`${PRODUCT_NAME} home`}>
                 <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <path d="M12 3L20 19H4L12 3Z" fill="currentColor" />
                 </svg>
-                Credex
+                {PRODUCT_NAME}
               </a>
               <a className="header-cta" href="/audit">Run audit</a>
             </header>
@@ -125,8 +127,8 @@ export function LandingBodyMarkup() {
                     </div>
                   </div>
       
-                  <div className="insights-after" aria-label="Optimized monthly spend after Credex-style changes">
-                    <h3 className="insights-panel-title insights-panel-title--after">After Credex</h3>
+                  <div className="insights-after" aria-label="Optimized monthly spend after modeled changes">
+                    <h3 className="insights-panel-title insights-panel-title--after">After optimization</h3>
                     <div className="insights-row">
                       <span className="insights-model">Claude 3.5 Haiku</span>
                       <div className="insights-bar-track"><div className="insights-bar insights-bar--opt" style={{ width: "100%" }}></div></div>

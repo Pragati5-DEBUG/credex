@@ -1,13 +1,15 @@
 "use client";
 
+import { CREDIT_VENDOR_NAME, PRODUCT_NAME } from "@/lib/product-brand";
 import { DEMO_AUDIT_PAYLOAD } from "@/lib/audit-demo-payload";
 import { readSpendPayloadFromBrowserStorage } from "@/lib/audit-storage";
 import { PRIMARY_USE_CASE_OPTIONS, VENDOR_LABELS } from "@/lib/audit-intake-config";
 import { runAudit } from "@/lib/audit-engine";
+import { buildPublicSnapshot } from "@/lib/public-audit-snapshot";
 import type { AuditSpendFormPayload, AuditResult, AuditSavingsLine, VendorSlug } from "@/types/audit";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useMemo, useEffect, useState } from "react";
+import { useMemo, useEffect, useState, useCallback, type FormEvent } from "react";
 
 function parseSpend(s: string) {
   const n = parseFloat(String(s).replace(/[^0-9.]/g, ""));
@@ -28,11 +30,58 @@ function fmtUsd(n: number, maxFrac = 0) {
   });
 }
 
+/** Clipboard API is blocked on some origins; fall back to execCommand. */
+async function copyTextToClipboard(text: string): Promise<boolean> {
+  try {
+    if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch {
+    /* fall through */
+  }
+  try {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.position = "fixed";
+    ta.style.top = "0";
+    ta.style.left = "0";
+    ta.style.margin = "0";
+    ta.style.padding = "0";
+    ta.style.width = "1px";
+    ta.style.height = "1px";
+    ta.style.border = "none";
+    ta.style.opacity = "0";
+    ta.style.pointerEvents = "none";
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    ta.setSelectionRange(0, text.length);
+    const ok = document.execCommand("copy");
+    document.body.removeChild(ta);
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
 export function AuditSummaryClient() {
   const search = useSearchParams();
   const demo = search.get("demo") === "1";
   const [payload, setPayload] = useState<AuditSpendFormPayload | null>(null);
   const [audit, setAudit] = useState<AuditResult | null>(null);
+
+  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [shareBusy, setShareBusy] = useState(false);
+  const [shareError, setShareError] = useState<string | null>(null);
+
+  const [leadEmail, setLeadEmail] = useState("");
+  const [websiteHp, setWebsiteHp] = useState("");
+  const [leadBusy, setLeadBusy] = useState(false);
+  const [leadError, setLeadError] = useState<string | null>(null);
+  const [leadOk, setLeadOk] = useState<{ shareUrl: string; emailed: boolean; emailNote?: string } | null>(null);
+  const [copyStatus, setCopyStatus] = useState<"idle" | "copied" | "failed">("idle");
 
   useEffect(() => {
     if (demo) {
@@ -50,15 +99,19 @@ export function AuditSummaryClient() {
     }
   }, [demo]);
 
+  useEffect(() => {
+    setCopyStatus("idle");
+  }, [shareUrl]);
+
   const combined = audit?.combinedCurrentMonthlyUsd ?? 0;
   const savings = audit?.totalMonthlySavingsUsd ?? 0;
   const afterMonthly = Math.max(0, combined - savings);
-  const credexPromo = audit && audit.savingsBand === "high";
+  const highSavingsCreditPromo = audit && audit.savingsBand === "high";
 
   const bandNote = useMemo(() => {
     if (!audit) return null;
     if (audit.savingsBand === "high") {
-      return "Modeled savings are above $500/mo — Credex credits can sometimes capture more than list-price tweaks alone.";
+      return `Modeled savings are above $500/mo — ${CREDIT_VENDOR_NAME} credits can sometimes capture more than list-price tweaks alone.`;
     }
     if (audit.savingsBand === "low") {
       return "Under $100/mo modeled savings — you are likely already close to public list; we will not inflate numbers.";
@@ -84,6 +137,87 @@ export function AuditSummaryClient() {
     return out;
   }, [payload, audit]);
 
+  const snapshot = useMemo(() => (audit ? buildPublicSnapshot(audit) : null), [audit]);
+
+  const onCreateShareLink = useCallback(async () => {
+    if (!snapshot) return;
+    setShareError(null);
+    setShareBusy(true);
+    try {
+      const res = await fetch("/api/share", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ snapshot }),
+      });
+      const j = (await res.json().catch(() => ({}))) as {
+        urlPath?: string;
+        error?: string;
+        message?: string;
+      };
+      if (!res.ok) {
+        setShareError(j.message ?? j.error ?? "Could not create link.");
+        return;
+      }
+      const path = typeof j.urlPath === "string" ? j.urlPath : "";
+      if (!path) {
+        setShareError("Unexpected response from server.");
+        return;
+      }
+      setShareUrl(`${window.location.origin}${path}`);
+    } catch {
+      setShareError("Network error — try again.");
+    } finally {
+      setShareBusy(false);
+    }
+  }, [snapshot]);
+
+  const onEmailLead = useCallback(
+    async (e: FormEvent<HTMLFormElement>) => {
+      e.preventDefault();
+      if (!snapshot) return;
+      if (websiteHp.trim()) return;
+      setLeadError(null);
+      setLeadOk(null);
+      setLeadBusy(true);
+      try {
+        const res = await fetch("/api/leads", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: leadEmail.trim(),
+            snapshot,
+            website: websiteHp,
+          }),
+        });
+        const j = (await res.json().catch(() => ({}))) as {
+          ok?: boolean;
+          shareUrl?: string;
+          emailed?: boolean;
+          emailNote?: string;
+          error?: string;
+          message?: string;
+        };
+        if (!res.ok) {
+          setLeadError(j.message ?? j.error ?? "Could not save or email.");
+          return;
+        }
+        if (j.shareUrl) {
+          setLeadOk({
+            shareUrl: j.shareUrl,
+            emailed: Boolean(j.emailed),
+            emailNote: typeof j.emailNote === "string" ? j.emailNote : undefined,
+          });
+          setShareUrl(j.shareUrl);
+        }
+      } catch {
+        setLeadError("Network error — try again.");
+      } finally {
+        setLeadBusy(false);
+      }
+    },
+    [snapshot, leadEmail, websiteHp],
+  );
+
   return (
     <div className="min-h-screen bg-[#050508] text-zinc-100 [color-scheme:dark]">
       <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6 lg:px-8">
@@ -94,7 +228,7 @@ export function AuditSummaryClient() {
               <path d="M12 3L20 19H4L12 3Z" fill="currentColor" />
             </svg>
             <span className="bg-gradient-to-r from-violet-300 to-fuchsia-300 bg-clip-text text-lg font-bold tracking-tight text-transparent">
-              Credex
+              {PRODUCT_NAME}
             </span>
             <span className="rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wider text-zinc-500">
               Audit
@@ -262,9 +396,9 @@ export function AuditSummaryClient() {
               </p>
             ) : null}
 
-            {credexPromo ? (
+            {highSavingsCreditPromo ? (
               <div className="mb-8 rounded-xl border border-amber-500/25 bg-amber-500/[0.08] p-4 sm:p-5">
-                <p className="text-xs font-bold uppercase tracking-wider text-amber-200/90">Credex</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-amber-200/90">{CREDIT_VENDOR_NAME}</p>
                 <p className="mt-1 text-sm leading-relaxed text-amber-100/90">
                   Large modeled savings — discounted AI infrastructure credits may beat retail alone. Capture email after
                   value in the shipped MVP, then book a consult.
@@ -330,6 +464,120 @@ export function AuditSummaryClient() {
                 })}
               </ul>
             </section>
+
+            {!demo ? (
+              <section
+                className="relative mb-8 rounded-xl border border-white/[0.08] bg-[#0b0b0f] p-5 sm:p-6"
+                aria-labelledby="share-email-heading"
+              >
+                <h2 id="share-email-heading" className="text-sm font-semibold tracking-tight text-white">
+                  Read-only link & email
+                </h2>
+                <p className="mt-1 text-sm leading-relaxed text-zinc-500">
+                  Save a shareable snapshot (no PII). Optionally email yourself the link — requires Supabase + Resend in{" "}
+                  <code className="rounded bg-white/10 px-1 py-0.5 text-xs text-zinc-300">web/.env.local</code>.
+                </p>
+
+                <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                  <button
+                    type="button"
+                    onClick={() => void onCreateShareLink()}
+                    disabled={shareBusy || !snapshot}
+                    className="inline-flex items-center justify-center rounded-xl border border-violet-500/35 bg-violet-600/20 px-4 py-3 text-sm font-semibold text-violet-100 transition hover:border-violet-400/45 hover:bg-violet-600/30 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {shareBusy ? "Creating…" : "Create read-only link"}
+                  </button>
+                  {shareUrl ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        void (async () => {
+                          const ok = await copyTextToClipboard(shareUrl);
+                          setCopyStatus(ok ? "copied" : "failed");
+                          window.setTimeout(() => setCopyStatus("idle"), 2500);
+                        })();
+                      }}
+                      className="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] px-4 py-3 text-sm font-medium text-zinc-200 hover:bg-white/[0.1]"
+                    >
+                      {copyStatus === "copied"
+                        ? "Copied"
+                        : copyStatus === "failed"
+                          ? "Retry copy"
+                          : "Copy link"}
+                    </button>
+                  ) : null}
+                </div>
+                {shareError ? (
+                  <p className="mt-3 text-sm text-red-300/90" role="alert">
+                    {shareError}
+                  </p>
+                ) : null}
+                {shareUrl ? (
+                  <div className="mt-3 space-y-2">
+                    <p className="select-all break-all rounded-lg border border-white/[0.06] bg-black/30 px-3 py-2 font-mono text-xs text-emerald-200/90">
+                      {shareUrl}
+                    </p>
+                    {copyStatus === "failed" ? (
+                      <p className="text-xs text-amber-200/90">
+                        Automatic copy was blocked (browser or HTTP). Select the URL above and use Ctrl+C / ⌘C, or open
+                        the site over HTTPS.
+                      </p>
+                    ) : null}
+                  </div>
+                ) : null}
+
+                <form onSubmit={onEmailLead} className="mt-6 space-y-3 border-t border-white/[0.06] pt-6">
+                  <label className="block text-xs font-medium uppercase tracking-wider text-zinc-500" htmlFor="lead-email">
+                    Email me the link
+                  </label>
+                  <input
+                    id="lead-email"
+                    type="email"
+                    inputMode="email"
+                    autoComplete="email"
+                    required
+                    value={leadEmail}
+                    onChange={(e) => setLeadEmail(e.target.value)}
+                    placeholder="you@company.com"
+                    className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm text-white outline-none ring-violet-500/30 placeholder:text-zinc-600 focus:border-violet-500/40 focus:ring-2"
+                  />
+                  <input
+                    type="text"
+                    name="website"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    value={websiteHp}
+                    onChange={(e) => setWebsiteHp(e.target.value)}
+                    className="pointer-events-none absolute h-px w-px opacity-0"
+                    aria-hidden
+                  />
+                  <button
+                    type="submit"
+                    disabled={leadBusy || !snapshot}
+                    className="w-full rounded-xl border border-white/10 bg-white/[0.08] py-3 text-sm font-semibold text-white hover:bg-white/[0.12] disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto sm:px-6"
+                  >
+                    {leadBusy ? "Sending…" : "Save lead & email link"}
+                  </button>
+                  {leadError ? (
+                    <p className="text-sm text-red-300/90" role="alert">
+                      {leadError}
+                    </p>
+                  ) : null}
+                  {leadOk ? (
+                    <div className="rounded-lg border border-emerald-500/25 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-100/95">
+                      <p className="break-all font-mono text-xs text-emerald-200/90">{leadOk.shareUrl}</p>
+                      <p className="mt-2 text-emerald-200/80">
+                        {leadOk.emailed
+                          ? "Check your inbox for the same link."
+                          : leadOk.emailNote
+                            ? `Link saved; email not sent: ${leadOk.emailNote}`
+                            : "Link saved; email was not sent (check Resend)."}
+                      </p>
+                    </div>
+                  ) : null}
+                </form>
+              </section>
+            ) : null}
           </>
         ) : null}
 

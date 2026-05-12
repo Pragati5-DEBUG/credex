@@ -5,6 +5,7 @@ import {
   PRIMARY_USE_CASE_OPTIONS,
   VENDOR_OPTIONS,
 } from "@/lib/audit-intake-config";
+import { PRODUCT_NAME } from "@/lib/product-brand";
 import { AUDIT_STACK_STORAGE_KEY } from "@/lib/audit-storage";
 import type { AuditSpendFormPayload, AuditToolLine, PrimaryUseCase, VendorSlug } from "@/types/audit";
 import Link from "next/link";
@@ -270,11 +271,11 @@ export function AuditIntakeClient() {
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden>
             <path d="M12 3L20 19H4L12 3Z" fill="currentColor" />
           </svg>
-          <span className="text-lg font-bold tracking-tight">Credex</span>
+          <span className="text-lg font-bold tracking-tight">{PRODUCT_NAME}</span>
         </div>
         <h1 className="sr-only">AI spend audit intake</h1>
         <p className="mb-8 text-center text-[0.9375rem] leading-relaxed text-zinc-400">
-          Per the Credex brief: each tool needs a <strong className="text-white">plan</strong>,{" "}
+          Each tool needs a <strong className="text-white">plan</strong>,{" "}
           <strong className="text-white">monthly spend</strong>, and <strong className="text-white">seats</strong>.
           Also your <strong className="text-white">team size</strong> and{" "}
           <strong className="text-white">primary use case</strong>.

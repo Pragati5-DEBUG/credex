@@ -1,5 +1,6 @@
 "use client";
 
+import { PRODUCT_NAME } from "@/lib/product-brand";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 
@@ -23,7 +24,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
         <div className="mb-8 px-2">
           <Link href="/" className="block">
             <span className="bg-gradient-to-r from-violet-400 to-fuchsia-400 bg-clip-text text-lg font-bold tracking-tight text-transparent">
-              Credex
+              {PRODUCT_NAME}
             </span>
             <span className="mt-0.5 block text-[0.65rem] font-medium uppercase tracking-widest text-zinc-600">
               Spend lab
@@ -39,7 +40,7 @@ export function DashboardShell({ children }: { children: React.ReactNode }) {
             type="button"
             className="flex w-full items-center justify-between rounded-lg border border-white/[0.08] bg-black/30 px-2.5 py-2 text-left text-sm font-medium text-zinc-200 hover:border-violet-500/30"
           >
-            CREDEX
+            Demo
             <span className="text-zinc-600" aria-hidden>
               ▾
             </span>

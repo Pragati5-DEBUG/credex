@@ -1,9 +1,10 @@
 import { AuditSummaryClient } from "@/components/audit/AuditSummaryClient";
+import { PRODUCT_NAME } from "@/lib/product-brand";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
-  title: "Audit saved — Credex",
+  title: `Audit saved — ${PRODUCT_NAME}`,
 };
 
 export default function AuditSummaryPage() {
