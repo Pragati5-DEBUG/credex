@@ -6,6 +6,7 @@ import { readSpendPayloadFromBrowserStorage } from "@/lib/audit-storage";
 import { PRIMARY_USE_CASE_OPTIONS, VENDOR_LABELS } from "@/lib/audit-intake-config";
 import { runAudit } from "@/lib/audit-engine";
 import { buildPublicSnapshot } from "@/lib/public-audit-snapshot";
+import { normalizePublicShareUrl } from "@/lib/share-url";
 import type { AuditSpendFormPayload, AuditResult, AuditSavingsLine, VendorSlug } from "@/types/audit";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -191,13 +192,14 @@ export function AuditSummaryClient() {
           return;
         }
         if (j.shareUrl) {
+          const shareUrl = normalizePublicShareUrl(j.shareUrl, window.location.origin);
           setLeadOk({
-            shareUrl: j.shareUrl,
+            shareUrl,
             emailed: Boolean(j.emailed),
             emailNote: typeof j.emailNote === "string" ? j.emailNote : undefined,
           });
           setCopyStatus("idle");
-          setShareUrl(j.shareUrl);
+          setShareUrl(shareUrl);
         }
       } catch {
         setLeadError("Network error — try again.");
@@ -235,9 +237,6 @@ export function AuditSummaryClient() {
           ) : (
             <>
               <h1 className="text-2xl font-semibold tracking-tight text-white sm:text-3xl">Your audit snapshot</h1>
-              <p className="mt-2 max-w-2xl text-sm leading-relaxed text-zinc-500">
-                At-a-glance spend vs modeled list anchors. No LLM math — defensible rules only.
-              </p>
             </>
           )}
         </header>
@@ -476,12 +475,8 @@ export function AuditSummaryClient() {
                 <h2 id="share-email-heading" className="text-sm font-semibold tracking-tight text-white">
                   Read-only link & email
                 </h2>
-                <p className="mt-1 text-sm leading-relaxed text-zinc-500">
-                  Save a shareable snapshot (no PII). Optionally email yourself the link — requires Supabase + Resend in{" "}
-                  <code className="rounded bg-white/10 px-1 py-0.5 text-xs text-zinc-300">web/.env.local</code>.
-                </p>
 
-                <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <motion.div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                   <button
                     type="button"
                     onClick={() => void onCreateShareLink()}

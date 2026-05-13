@@ -1,23 +1,33 @@
-# AiTookMySalary — AI spend audit (Round 1)
+AiTookMySalary
 
-**AiTookMySalary helps founders and engineering leads benchmark AI tool spend against defensible list-price anchors, then optionally capture a lead and share a read-only report — lead-gen for discounted AI infrastructure credits (per the brief, **Credex** as a credits vendor).** Built as a Next.js web app per [`credex.pdf`](./credex.pdf).
+AiTookMySalary is a free web app for founders and engineering leads who pay for AI tools. You enter your stack, plans, seats, and monthly spend; a rule-based engine compares that to cited list pricing and shows modeled savings plus a shareable report. Email capture and an optional summary run after results are shown.
 
-**Live app:** _[Add your deployed URL before submitting — e.g. https://….vercel.app]_  
+Live app: https://credex-ivory.vercel.app
 
-**Screenshots / demo:** _[Add 3+ screenshots here or a ~30s Loom/YouTube link]_  
+Screenshots
 
----
+Landing
 
-## Quick start
+![Landing page](docs/screenshots/landing.png)
 
-From **repo root**:
+Audit intake
+
+![Audit intake](docs/screenshots/audit-intake.png)
+
+Audit summary
+
+![Audit summary](docs/screenshots/audit-summary.png)
+
+Quick start
+
+From the repo root:
 
 ```bash
 npm install --prefix web
 npm run dev
 ```
 
-From **`web/`**:
+Or from web/:
 
 ```bash
 cd web
@@ -25,74 +35,23 @@ npm install
 npm run dev
 ```
 
-- **`npm run dev`** opens the browser when ready (see terminal for **Local:** URL — often `http://localhost:3000`).
-- Only one `next dev` at a time. **`npm run dev:plain`** skips auto-open (`cd web && npm run dev:plain`).
-- Production build: `npm run build --prefix web` then `npm run start --prefix web`.
+Copy web/.env.example to web/.env.local and fill in Supabase, Resend, and any optional LLM keys. Run SUPABASE.sql on your Supabase project before using share links or lead capture.
 
-Env: copy [`web/.env.example`](./web/.env.example) → **`web/.env.local`**. See [`SUPABASE.sql`](./SUPABASE.sql) for database setup.
+Production build:
 
----
+```bash
+npm run build --prefix web
+npm run start --prefix web
+```
 
-## Repo map (submission docs)
+Deploy
 
-| File | Purpose |
-|------|---------|
-| [`ARCHITECTURE.md`](./ARCHITECTURE.md) | Diagram, data flow, stack, scale notes |
-| [`DEVLOG.md`](./DEVLOG.md) | Seven daily entries (fill dates — assignment format) |
-| [`REFLECTION.md`](./REFLECTION.md) | Five prompts (150–400 words each) |
-| [`TESTS.md`](./TESTS.md) | Automated tests + how to run |
-| [`PRICING_DATA.md`](./PRICING_DATA.md) | Pricing sources for the engine |
-| [`PROMPTS.md`](./PROMPTS.md) | LLM prompts for executive summary |
-| [`GTM.md`](./GTM.md) | Go-to-market |
-| [`ECONOMICS.md`](./ECONOMICS.md) | Unit economics |
-| [`USER_INTERVIEWS.md`](./USER_INTERVIEWS.md) | **Three real interviews** — do not fabricate |
-| [`LANDING_COPY.md`](./LANDING_COPY.md) | Ship-ready landing copy draft |
-| [`METRICS.md`](./METRICS.md) | North Star + instrumentation |
+On Vercel, import this repo, set the root directory to web, and add NEXT_PUBLIC_APP_URL, SUPABASE_URL, and SUPABASE_SERVICE_ROLE_KEY. Add RESEND_API_KEY if you want email. Redeploy after changing environment variables.
 
-CI: [`.github/workflows/ci.yml`](./.github/workflows/ci.yml) — lint + tests on push to **`main`**.
+Decisions
 
----
-
-## App (`web/`)
-
-| Route | Description |
-|-------|-------------|
-| `/` | Marketing landing |
-| `/audit` | Spend intake (tools, plans, seats, spend; persisted in `localStorage`) |
-| `/audit/summary` | Audit results + executive readout + share + email capture |
-| `/r/[id]` | Public read-only snapshot (no email/company); OG metadata |
-
-| Area | Path |
-|------|------|
-| Audit engine | `web/src/lib/audit-engine/` |
-| API routes | `web/src/app/api/` |
-
----
-
-## Decisions (trade-offs)
-
-1. **Rules-first audit math, LLM only for narrative** — Keeps finance-defensible numbers and avoids “AI invented savings” (per brief). Trade-off: more maintenance when vendors change pricing (mitigated by `PRICING_DATA.md`).
-2. **Supabase for shares/leads** — Faster than self-hosted Postgres for a week-long scope; trade-off: vendor lock-in and correct **service role** key discipline.
-3. **Client-side `runAudit` on summary** — Instant UX without round-trip for math; trade-off: very large stacks could move server-side later.
-4. **Public snapshot strips PII** — Share links stay safe for Slack; trade-off: public page can’t show optional tool labels from intake.
-5. **Resend for transactional email** — Simple API vs SES setup time; trade-off: deliverability tuning and verified **from** domain for production.
-
----
-
-## Scripts (from `web/`)
-
-| Command | Purpose |
-|---------|---------|
-| `npm run lint` | ESLint |
-| `npm run test` | Vitest (`tests` listed in [`TESTS.md`](./TESTS.md)) |
-| `npm run build` | Production build |
-
----
-
-## Deploy
-
-Typical: **Vercel** → import repo, root **`web`**, set env vars (`NEXT_PUBLIC_APP_URL`, Supabase, Resend, optional LLM keys). Run **`SUPABASE.sql`** on your Supabase project first.
-
----
-
-Brief: [`credex.pdf`](./credex.pdf)
+1. Rules-first audit math, LLM only for narrative — Keeps savings defensible; vendor price changes need updates in PRICING_DATA.md.
+2. Supabase for shares and leads — Fast to ship; relies on keeping the service role key server-side only.
+3. Client-side audit on the summary page — Instant results; very large stacks might move server-side later.
+4. Public share links strip PII — Safe to forward; the public page omits email and company fields.
+5. Resend for email — Simple setup; production deliverability improves once you verify a sender domain.

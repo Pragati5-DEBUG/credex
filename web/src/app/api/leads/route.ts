@@ -10,9 +10,22 @@ export const runtime = "nodejs";
 const MAX_BODY = 120_000;
 const LEADS_PER_IP_HOUR = 15;
 
-function appOrigin(): string {
+/** Public origin for links in emails / JSON — prefer the request (correct on Vercel even if NEXT_PUBLIC_APP_URL is wrong or missing). */
+function appOrigin(req: NextRequest): string {
+  const hostRaw =
+    req.headers.get("x-forwarded-host")?.split(",")[0]?.trim() || req.headers.get("host")?.trim();
+  if (hostRaw) {
+    const isLocal = /^localhost(:\d+)?$/i.test(hostRaw) || /^127\.0\.0\.1(:\d+)?$/i.test(hostRaw);
+    const protoRaw =
+      req.headers.get("x-forwarded-proto")?.split(",")[0]?.trim() || (isLocal ? "http" : "https");
+    return `${protoRaw}://${hostRaw}`.replace(/\/$/, "");
+  }
   const explicit = process.env.NEXT_PUBLIC_APP_URL?.trim();
-  if (explicit) return explicit.replace(/\/$/, "");
+  if (explicit) {
+    const normalized = explicit.replace(/\/$/, "");
+    const isLocalExplicit = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/i.test(normalized);
+    if (!isLocalExplicit) return normalized;
+  }
   const vercel = process.env.VERCEL_URL?.trim();
   if (vercel) return `https://${vercel.replace(/^https?:\/\//, "")}`;
   return "http://localhost:3000";
@@ -30,7 +43,7 @@ function escapeHtmlAttr(s: string): string {
 
 async function sendLeadEmail(to: string, shareUrl: string): Promise<SendEmailResult> {
   const key = process.env.RESEND_API_KEY?.trim();
-  if (!key) return { sent: false, reason: "RESEND_API_KEY is not set in web/.env.local" };
+  if (!key) return { sent: false, reason: "RESEND_API_KEY is not set on the server." };
   const from =
     process.env.RESEND_FROM?.trim() || `${PRODUCT_NAME.replace(/"/g, "")} <onboarding@resend.dev>`;
 
@@ -143,7 +156,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "db_error", message: leadErr.message }, { status: 500 });
   }
 
-  const origin = appOrigin();
+  const origin = appOrigin(req);
   const shareUrl = `${origin}/r/${shareId}`;
 
   const emailResult = await sendLeadEmail(email, shareUrl);

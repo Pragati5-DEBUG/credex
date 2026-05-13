@@ -1,6 +1,6 @@
-# Credex — architecture
+Architecture
 
-## System diagram
+System diagram
 
 ```mermaid
 flowchart LR
@@ -34,29 +34,27 @@ flowchart LR
   Public --> SB
 ```
 
-## Data flow
+Data flow
 
-1. User fills **team size**, **primary use case**, and **per-tool rows** (vendor, plan, seats, monthly spend) on `/audit`. Payload is written to **`localStorage`** (`audit-storage.ts`) so reloads keep state.
-2. On `/audit/summary`, the client reads storage (or demo payload), runs **`runAudit()`** in-browser — pure TypeScript; outputs **`AuditResult`** (lines, totals, savings band).
-3. **Executive readout** (template or LLM via `/api/summary`) summarizes **`PublicAuditSnapshot`** — derived fields only, no email/company on storage for OG-safe payloads.
-4. **Share:** client POSTs **`PublicAuditSnapshot`** to **`/api/share`** → Supabase **`audit_shares`** row → returns **`/r/{id}`**.
-5. **Leads:** POST includes email + optional fields + honeypot + snapshot/share id → **`audit_leads`** + transactional email via **Resend** when configured.
-6. **Public page** `/r/[id]` server-loads JSON from **`audit_shares`** by id; **`generateMetadata`** sets Open Graph / Twitter.
+1. On /audit the user enters team size, primary use case, and per-tool rows (vendor, plan, seats, monthly spend). The payload is saved in localStorage so a reload keeps the form.
+2. On /audit/summary the client reads that payload (or a demo stack), runs runAudit in the browser, and gets line items, totals, and a savings band.
+3. An optional executive readout uses a template or POST /api/summary with a public snapshot shape only (no email or company on the share payload).
+4. Share: the client POSTs the snapshot to /api/share; Supabase stores audit_shares and returns /r/{id}.
+5. Leads: POST saves email and optional fields to audit_leads, with honeypot and rate limiting; Resend sends the link when configured.
+6. /r/[id] loads the snapshot server-side and sets Open Graph and Twitter metadata.
 
-## Stack choice
+Stack
 
-| Layer | Choice | Why |
-|-------|--------|-----|
-| Framework | Next.js 16 App Router | SSR for OG on share URLs, API routes colocated, React ecosystem, deploys cleanly to Vercel. |
-| UI | Tailwind CSS v4 | Fast iteration, consistent spacing/typography without template lock-in (per brief). |
-| Audit logic | TS modules + Vitest | Deterministic, testable rules — no LLM in the pricing math (per brief). |
-| Backend | Supabase Postgres | Tables for shares/leads without running Postgres myself; service role from server only. |
-| Email | Resend | Simple HTTP API, fits transactional “here is your link” flow. |
+- Next.js 16 App Router — SSR for share previews, API routes beside the UI, straightforward Vercel deploy.
+- Tailwind CSS v4 — layout and typography without a locked admin template.
+- TypeScript audit modules and Vitest — deterministic rules and tests; no LLM in pricing math.
+- Supabase Postgres — shares and leads without self-hosting Postgres; service role only on the server.
+- Resend — transactional email with a simple HTTP API.
 
-## If this handled ~10k audits/day
+At roughly 10k audits per day
 
-- Move **`runAudit`** behind a queue if audits become server-side jobs; cache **pricing-catalog** reads in memory.
-- **Rate limits:** stricter per-IP (Redis / Upstash), captcha for `/api/leads` if abused.
-- **Supabase:** connection pooling (PgBouncer), indexes on `audit_shares.id`, `audit_leads(created_at, ip)`.
-- **Share reads:** edge-cache immutable snapshots or CDN for `/r/*` static shell + API slice if needed.
-- **Observability:** structured logs on API routes, alerts on 5xx and Resend bounce rates.
+- Run audits on the server behind a queue if stacks grow; keep pricing catalog in memory.
+- Tighten rate limits (e.g. Redis) and add captcha on /api/leads if abused.
+- Use connection pooling, indexes on share ids and lead timestamps and IPs.
+- Cache or CDN immutable /r/* reads where it helps.
+- Add structured logging and alerts on API errors and email bounces.
