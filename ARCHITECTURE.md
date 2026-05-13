@@ -5,21 +5,21 @@ System diagram
 ```mermaid
 flowchart LR
   subgraph client [Browser]
-    Landing[Landing /]
-    AuditForm[/audit intake]
-    Summary[/audit/summary]
-    Public[/r/id public report]
+    Landing["Landing page"]
+    AuditForm["Audit intake"]
+    Summary["Audit summary"]
+    Public["Public share page"]
   end
   subgraph next [Next.js server]
-    Engine[run-audit.ts]
-    ShareAPI[POST /api/share]
-    LeadsAPI[POST /api/leads]
-    SummaryAPI[POST /api/summary]
+    Engine["runAudit"]
+    ShareAPI["POST api share"]
+    LeadsAPI["POST api leads"]
+    SummaryAPI["POST api summary"]
   end
   subgraph data [Persistence]
     LS[(localStorage)]
-    SB[(Supabase Postgres)]
-    Ext[Resend / Anthropic / OpenAI APIs]
+    SB[(Supabase)]
+    Ext["Resend and LLM APIs"]
   end
   AuditForm --> LS
   AuditForm --> Engine
