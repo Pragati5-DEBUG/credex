@@ -476,7 +476,7 @@ export function AuditSummaryClient() {
                   Read-only link & email
                 </h2>
 
-                <motion.div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+                <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
                   <button
                     type="button"
                     onClick={() => void onCreateShareLink()}
