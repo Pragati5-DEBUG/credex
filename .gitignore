@@ -8,6 +8,9 @@ web/npm-debug.log*
 web/.env
 web/.env.*
 
+# Monorepo deploy shim (local / Vercel repo-root builds)
+.next/
+
 # OS
 .DS_Store
 Thumbs.db
