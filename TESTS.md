@@ -1,6 +1,6 @@
-# Automated tests
+Automated tests
 
-Run from **`web/`**:
+Run from web/:
 
 ```bash
 npm run test
@@ -12,16 +12,32 @@ Watch mode:
 npm run test:watch
 ```
 
-## Audit engine (Vitest)
+Lint (also runs in CI):
 
-| File | What it covers |
-|------|----------------|
-| [`web/src/lib/audit-engine/run-audit.test.ts`](web/src/lib/audit-engine/run-audit.test.ts) | **5 tests** on `runAudit`: Cursor Business → cheaper Pro tier savings; spend alignment on same tier; no invented savings when list matches; API usage rows; PDF savings-band thresholds (`high` / `moderate` / `low`). |
+```bash
+npm run lint
+```
 
-## Other
+CI
 
-| File | What it covers |
-|------|----------------|
-| [`web/src/lib/public-audit-snapshot.test.ts`](web/src/lib/public-audit-snapshot.test.ts) | `buildPublicSnapshot` maps audit lines to a PII-safe public payload and validates shape. |
+GitHub Actions workflow: .github/workflows/ci.yml
 
-**Total:** 6 tests (5 specifically on the audit engine per assignment minimum).
+On every push to main: npm ci, npm run lint, npm run test in web/ (Node 20).
+
+Audit engine (Vitest) — 5 tests minimum
+
+File: web/src/lib/audit-engine/run-audit.test.ts
+
+- recommends Cursor Pro list when Business is overstated vs list
+- aligns spend when above list on same tier
+- does not invent savings when list matches spend (mixed = no cross-vendor churn)
+- returns zero modeled savings for API usage rows
+- classifies savings band for PDF thresholds (high / moderate / low)
+
+Other
+
+File: web/src/lib/public-audit-snapshot.test.ts
+
+- maps audit lines to a PII-safe public snapshot and validates shape
+
+Total: 6 tests (5 on the audit engine).

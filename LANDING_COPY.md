@@ -1,42 +1,42 @@
-# Landing page copy (draft)
+Landing page copy (draft)
 
-_Ship-quality draft; mock social proof is labeled._
+Ship-quality draft; mock social proof is labeled.
 
-## Hero headline (≤10 words)
+Hero headline (≤10 words)
 
-**See what your AI stack should cost — before finance asks.**
+Finance hasn't asked yet. Your AI bills have.
 
-## Subheadline (≤25 words)
+Subheadline (≤25 words)
 
-Rule-based benchmarks against current list pricing. No login: enter your tools, seats, and spend; get an audit you can share in one link.
+Public list-price math on your tool pile. No login—seats, spend, one link to send when guilt kicks in.
 
-## Primary CTA
+Primary CTA
 
-**Run free audit**
+Run free audit
 
-## Secondary CTA (optional)
+Secondary CTA (optional)
 
 View sample results
 
-## Social proof block _(mocked — replace with real logos/quotes when available)_
+Social proof block (mocked — replace with real logos/quotes when available)
 
-> “We thought we were ‘fine’ until this broke out spend by seat.” — **Engineering lead, Series A SaaS** _(illustrative quote — fictional)_  
+“We thought we were ‘fine’ until this broke out spend by seat.” — Engineering lead, Series A SaaS (illustrative quote — fictional)
 
-**Trusted by teams shipping with Cursor, ChatGPT, and Copilot** _(placeholder strip — replace with real customer names only when accurate)._
+Trusted by teams shipping with Cursor, ChatGPT, and Copilot (placeholder strip — replace with real customer names only when accurate).
 
-## FAQ — five Q&As
+FAQ — five Q&As
 
-**1. Is this financial advice?**  
+1. Is this financial advice?
 No. Modeled savings use public list anchors and rules documented in our methodology — use them as a starting point for internal budgeting, not investment advice.
 
-**2. Do you sell my data?**  
+2. Do you sell my data?
 We store optional lead info if you ask us to email the report; public share links intentionally omit email and company name. See your deployment’s privacy policy.
 
-**3. Why might my bill differ from the audit?**  
+3. Why might my bill differ from the audit?
 Enterprise discounts, annual contracts, credits, and taxes aren’t visible from a simple form — we don’t pretend to know your contract.
 
-**4. Who is Credex?**  
+4. Who is Credex?
 Credex helps teams buy AI infrastructure at better-than-list economics when overspend is real — the audit is free because underspending startups rarely know they’re leaving money on the table.
 
-**5. Do I need a login?**  
-No login to run an audit. Email is optional and comes **after** you see results.
+5. Do I need a login?
+No login to run an audit. Email is optional and comes after you see results.
