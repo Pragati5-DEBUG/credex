@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "node ./scripts/dev-open.mjs",
     "dev:plain": "next dev",
-    "build": "next build --webpack && node ./scripts/ensure-vercel-manifest.mjs",
+    "build": "next build --webpack",
+    "postbuild": "node ./scripts/ensure-vercel-manifest.mjs",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest run",
