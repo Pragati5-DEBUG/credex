@@ -2,7 +2,8 @@ AiTookMySalary
 
 AiTookMySalary is a free web app for founders and engineering leads who pay for AI tools. You enter your stack, plans, seats, and monthly spend; a rule-based engine compares that to cited list pricing and shows modeled savings plus a shareable report. Email capture and an optional summary run after results are shown.
 
-Live app: https://credex-ivory.vercel.app
+Live app: https://aitookmysalary.vercel.app
+
 
 Screenshots
 
@@ -46,7 +47,7 @@ npm run start --prefix web
 
 Deploy
 
-On Vercel, import this repo, set the root directory to web, and add NEXT_PUBLIC_APP_URL, SUPABASE_URL, and SUPABASE_SERVICE_ROLE_KEY. Add RESEND_API_KEY if you want email. Redeploy after changing environment variables.
+On Vercel, import this repo, set **Root Directory** to `web`, and add `NEXT_PUBLIC_APP_URL` (for example `https://aitookmysalary.vercel.app`), `SUPABASE_URL`, and `SUPABASE_SERVICE_ROLE_KEY`. Add `RESEND_API_KEY` if you want email. Redeploy after changing environment variables. Leave the repository root empty in Vercel; do not point the project at the repo root.
 
 Decisions
 

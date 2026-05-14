@@ -1,4 +1,4 @@
 {
   "installCommand": "npm ci",
-  "buildCommand": "npm run build"
+  "buildCommand": "next build --webpack && node ./scripts/ensure-vercel-manifest.mjs"
 }
