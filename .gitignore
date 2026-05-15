@@ -1,15 +1,13 @@
-# Next app
-web/node_modules/
-web/.next/
-web/out/
-web/.vercel
-web/*.tsbuildinfo
-web/npm-debug.log*
-web/.env
-web/.env.*
-
-# Monorepo deploy shim (local / Vercel repo-root builds)
+# Next.js
+node_modules/
 .next/
+out/
+.vercel
+*.tsbuildinfo
+npm-debug.log*
+.env
+.env.*
+!.env.example
 
 # OS
 .DS_Store

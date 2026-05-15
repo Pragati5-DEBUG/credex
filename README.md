@@ -24,30 +24,22 @@ Quick start
 From the repo root:
 
 ```bash
-npm install --prefix web
-npm run dev
-```
-
-Or from web/:
-
-```bash
-cd web
 npm install
 npm run dev
 ```
 
-Copy web/.env.example to web/.env.local and fill in Supabase, Resend, and any optional LLM keys. Run SUPABASE.sql on your Supabase project before using share links or lead capture.
+Copy `.env.example` to `.env.local` and fill in Supabase, Resend, and any optional LLM keys. Run SUPABASE.sql on your Supabase project before using share links or lead capture.
 
 Production build:
 
 ```bash
-npm run build --prefix web
-npm run start --prefix web
+npm run build
+npm run start
 ```
 
 Deploy
 
-On Vercel, import this repo, set **Root Directory** to `web`, and add `NEXT_PUBLIC_APP_URL` (for example `https://aitookmysalary.vercel.app`), `SUPABASE_URL`, and `SUPABASE_SERVICE_ROLE_KEY`. Add `RESEND_API_KEY` if you want email. Redeploy after changing environment variables. Leave the repository root empty in Vercel; do not point the project at the repo root.
+On Vercel, import this repo, leave **Root Directory** empty, and add `NEXT_PUBLIC_APP_URL` (for example `https://aitookmysalary.vercel.app`), `SUPABASE_URL`, and `SUPABASE_SERVICE_ROLE_KEY`. Add `RESEND_API_KEY` if you want email. Redeploy with **Clear build cache** after changing settings or environment variables.
 
 Decisions
 

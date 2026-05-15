@@ -1,6 +1,6 @@
 Automated tests
 
-Run from web/:
+From the repo root:
 
 ```bash
 npm run test
@@ -22,11 +22,11 @@ CI
 
 GitHub Actions workflow: .github/workflows/ci.yml
 
-On every push to main: npm ci, npm run lint, npm run test in web/ (Node 20).
+On every push to main: npm ci, npm run lint, npm run test (Node 20).
 
 Audit engine (Vitest) — 5 tests minimum
 
-File: web/src/lib/audit-engine/run-audit.test.ts
+File: src/lib/audit-engine/run-audit.test.ts
 
 - recommends Cursor Pro list when Business is overstated vs list
 - aligns spend when above list on same tier
@@ -36,7 +36,7 @@ File: web/src/lib/audit-engine/run-audit.test.ts
 
 Other
 
-File: web/src/lib/public-audit-snapshot.test.ts
+File: src/lib/public-audit-snapshot.test.ts
 
 - maps audit lines to a PII-safe public snapshot and validates shape
 

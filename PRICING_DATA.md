@@ -1,6 +1,6 @@
 PRICING_DATA
 
-List-price sources for the audit engine (`web/src/lib/audit-engine/pricing-catalog.ts`). Update this file and the catalog together when a vendor changes pricing.
+List-price sources for the audit engine (`src/lib/audit-engine/pricing-catalog.ts`). Update this file and the catalog together when a vendor changes pricing.
 
 Verified as-of: 2026-05-10 (submission week). Currency: USD unless noted.
 

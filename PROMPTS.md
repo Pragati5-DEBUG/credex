@@ -2,7 +2,7 @@ PROMPTS.md
 
 LLM use in this repo is limited to the executive readout on `/audit/summary` via `POST /api/summary`. Audit savings math is not LLM-generated.
 
-Runtime: system text is bundled in `web/src/lib/summary-system-prompt.ts` (keep in sync with this file). User message is built in `openai-audit-summary.ts` and `anthropic-audit-summary.ts`. If no key works or the call fails, `buildTemplateAuditSummary` in `template-audit-summary.ts` returns a deterministic paragraph (not an LLM prompt).
+Runtime: system text is bundled in `src/lib/summary-system-prompt.ts` (keep in sync with this file). User message is built in `openai-audit-summary.ts` and `anthropic-audit-summary.ts`. If no key works or the call fails, `buildTemplateAuditSummary` in `template-audit-summary.ts` returns a deterministic paragraph (not an LLM prompt).
 
 Keys: `OPENAI_API_KEY` and/or `ANTHROPIC_API_KEY`; optional `SUMMARY_LLM_PROVIDER` (`auto` | `openai` | `anthropic`). Default `auto` tries OpenAI then Anthropic.
 
